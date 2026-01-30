@@ -169,12 +169,12 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4">
-          <PremiumButton primary onClick={() => document.getElementById('work').scrollIntoView({behavior:'smooth'})} className="w-full sm:w-auto">
-            See Our Work
+          <PremiumButton primary onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
+            Start Your Project
             <ArrowRight size={16} />
           </PremiumButton>
-          <PremiumButton onClick={() => document.getElementById('contact').scrollIntoView({behavior:'smooth'})} className="w-full sm:w-auto">
-            Start Your Project
+          <PremiumButton onClick={() => document.getElementById('work').scrollIntoView({behavior:'smooth'})} className="w-full sm:w-auto">
+            View Our Work
           </PremiumButton>
         </div>
 
@@ -266,6 +266,11 @@ const Work = () => {
                     src={project.image} 
                     alt={`${project.name} preview`}
                     className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                    onError={(e) => {
+                      // Fallback gradient if image fails to load
+                      e.target.style.display = 'none';
+                      e.target.parentElement.style.background = `linear-gradient(135deg, ${project.gradient.includes('rose') ? '#f43f5e, #ec4899' : project.gradient.includes('amber') ? '#f59e0b, #f97316' : '#3b82f6, #06b6d4'})`;
+                    }}
                   />
                   {/* Gradient Overlay */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-60 transition-opacity duration-500`}></div>
@@ -332,7 +337,7 @@ const Work = () => {
           <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6 px-4">
             Your business could be next. <span className="text-white font-semibold">Let's build something exceptional.</span>
           </p>
-          <PremiumButton primary onClick={() => document.getElementById('contact').scrollIntoView({behavior:'smooth'})} className="w-full sm:w-auto">
+          <PremiumButton primary onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
             Start Your Project
             <ArrowRight size={16} />
           </PremiumButton>
@@ -506,6 +511,103 @@ const Process = () => {
   );
 };
 
+// FAQ Section
+const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = [
+    {
+      question: "What if I don't like the design?",
+      answer: "We include unlimited revisions during the review phase (Day 5). We work with you until you're 100% happy with the result. Our goal is to create something you love."
+    },
+    {
+      question: "Do you offer revisions after launch?",
+      answer: "Yes! We include 2 weeks of post-launch support for minor tweaks and adjustments. Need ongoing updates? We offer maintenance packages starting at $200/month."
+    },
+    {
+      question: "What's included in the price?",
+      answer: "Everything: custom design, mobile optimization, fast hosting setup, SEO basics, and our signature WhatsApp integration (where applicable). No hidden fees."
+    },
+    {
+      question: "How does payment work?",
+      answer: "50% upfront to begin work, 50% upon completion before launch. We accept bank transfer, PayPal, or crypto. Payment plans available for projects over $3000."
+    },
+    {
+      question: "Can you integrate with my existing tools?",
+      answer: "Absolutely. We can integrate with booking systems, payment processors, CRMs, and most third-party tools. Just let us know what you need during the discovery call."
+    },
+    {
+      question: "What happens after the 7 days?",
+      answer: "Your site is live and fully yours. We provide all source code and documentation. You can manage it yourself or hire us for ongoing support—totally your choice."
+    },
+    {
+      question: "Do you work with businesses outside South Africa?",
+      answer: "Yes! We work with clients globally. All communication happens via WhatsApp, Zoom, and email. Time zones have never been an issue."
+    },
+    {
+      question: "What if I need my site faster?",
+      answer: "We can do rush projects in 3-4 days for an additional 50% fee. Message us to discuss your timeline and we'll make it work."
+    }
+  ];
+
+  return (
+    <section className="relative w-full bg-gradient-to-b from-black via-zinc-900 to-black px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-32 border-t border-white/5">
+      <div className="max-w-4xl mx-auto">
+        
+        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-3 sm:mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-base sm:text-lg text-gray-400">
+            Everything you need to know about working with us
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => (
+            <div 
+              key={idx}
+              className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300"
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                className="w-full px-6 py-5 flex items-center justify-between text-left group"
+              >
+                <span className="text-base sm:text-lg font-semibold text-white pr-4">
+                  {faq.question}
+                </span>
+                <div className={`flex-shrink-0 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center transition-transform duration-300 ${openIndex === idx ? 'rotate-180' : ''}`}>
+                  <ArrowRight size={14} className="text-white transform rotate-90" />
+                </div>
+              </button>
+              
+              <div className={`transition-all duration-300 ease-in-out ${openIndex === idx ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                <div className="px-6 pb-5 text-sm sm:text-base text-gray-400 leading-relaxed">
+                  {faq.answer}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Still Have Questions CTA */}
+        <div className="mt-12 sm:mt-16 text-center">
+          <p className="text-gray-400 mb-4">
+            Still have questions?
+          </p>
+          <button 
+            onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20have%20a%20question%20about%20Arcodic', '_blank')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full transition-colors"
+          >
+            <MessageSquare size={18} />
+            Chat on WhatsApp
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // Contact CTA
 const ContactCTA = () => {
   return (
@@ -536,14 +638,14 @@ const ContactCTA = () => {
         </p>
 
         {/* CTA Button */}
-        <PremiumButton primary className="text-base px-8 py-4">
+        <PremiumButton primary className="text-base px-8 py-4" onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')}>
           Start Your Project
           <ArrowRight size={18} />
         </PremiumButton>
 
         {/* Contact Info */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-500">
-          <span>Email: hello@arcodic.com</span>
+          <span>WhatsApp: +27 XX XXX XXXX</span>
           <div className="hidden sm:block w-1 h-1 bg-gray-600 rounded-full"></div>
           <span>Response time: Within 24 hours</span>
         </div>
@@ -590,6 +692,7 @@ export default function App() {
         <Work />
         <WhyChoose />
         <Process />
+        <FAQ />
         <ContactCTA />
       </main>
       <Footer />
