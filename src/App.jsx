@@ -169,7 +169,7 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4">
-          <PremiumButton primary onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
+          <PremiumButton primary onClick={() => window.open('https://wa.me/27676862733?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
             Start Your Project
             <ArrowRight size={16} />
           </PremiumButton>
@@ -221,7 +221,7 @@ const Work = () => {
       features: ["Interactive Menu", "Location Finder", "Brand Story", "Instagram Feed"],
       gradient: "from-amber-500/20 to-orange-500/20",
       image: "/coffee-hero.webp",
-      liveUrl: "https://coffee-demo.vercel.app" // Placeholder - update with actual link
+      liveUrl: "https://ritual-coffee111.vercel.app/"
     },
     {
       name: "MG Installations",
@@ -337,7 +337,7 @@ const Work = () => {
           <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6 px-4">
             Your business could be next. <span className="text-white font-semibold">Let's build something exceptional.</span>
           </p>
-          <PremiumButton primary onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
+          <PremiumButton primary onClick={() => window.open('https://wa.me/27676862733?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')} className="w-full sm:w-auto">
             Start Your Project
             <ArrowRight size={16} />
           </PremiumButton>
@@ -596,7 +596,7 @@ const FAQ = () => {
             Still have questions?
           </p>
           <button 
-            onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20have%20a%20question%20about%20Arcodic', '_blank')}
+            onClick={() => window.open('https://wa.me/27676862733?text=Hi%2C%20I%20have%20a%20question%20about%20Arcodic', '_blank')}
             className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full transition-colors"
           >
             <MessageSquare size={18} />
@@ -638,14 +638,14 @@ const ContactCTA = () => {
         </p>
 
         {/* CTA Button */}
-        <PremiumButton primary className="text-base px-8 py-4" onClick={() => window.open('https://wa.me/WHATSAPP_NUMBER_HERE?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')}>
+        <PremiumButton primary className="text-base px-8 py-4" onClick={() => window.open('https://wa.me/27676862733?text=Hi%2C%20I%20want%20to%20start%20a%20project%20with%20Arcodic', '_blank')}>
           Start Your Project
           <ArrowRight size={18} />
         </PremiumButton>
 
         {/* Contact Info */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-500">
-          <span>WhatsApp: +27 XX XXX XXXX</span>
+          <span>WhatsApp: +27 67 686 2733</span>
           <div className="hidden sm:block w-1 h-1 bg-gray-600 rounded-full"></div>
           <span>Response time: Within 24 hours</span>
         </div>
