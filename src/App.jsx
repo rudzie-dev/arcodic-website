@@ -1,187 +1,197 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ArrowUpRight,
-  Zap,
-  Smartphone,
-  Globe,
-  Instagram,
-  Twitter,
-  Menu,
-  X,
-  ArrowRight
+  X, ArrowUpRight, Zap, Send, Layers, Layout, 
+  Instagram, Twitter, ArrowRight, MessageCircle, Mail,
+  ChevronRight, Phone
 } from 'lucide-react';
 
-// --- Theme Config ---
-const ACCENT = "text-indigo-500"; // Change to 'text-blue-500' or 'text-emerald-500' for different vibes
-const ACCENT_BG = "bg-indigo-600";
+const App = () => {
+  const [dispersed, setDispersed] = useState(false);
+  const [activeBlock, setActiveBlock] = useState(null);
+  const [currentDemo, setCurrentDemo] = useState(0);
+  const [currentContact, setCurrentContact] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  // 1. Work Demos
+  const demos = [
+    { id: 1, name: 'Noir Atelier', tag: 'Luxury Hospitality', img: '/salon-hero.webp' },
+    { id: 2, name: 'Roast & Ritual', tag: 'Boutique Coffee', img: '/coffee-hero.webp' },
+    { id: 3, name: 'MG Installations', tag: 'Technical Services', img: '/installations-hero.webp' }
+  ];
 
+  // 2. Contact Channels for Inquiry Slab
+  const contacts = [
+    { id: 'wa', label: 'WhatsApp', value: '+27 67 686 2733', icon: <MessageCircle size={20} />, color: 'text-emerald-500' },
+    { id: 'ig', label: 'Instagram', value: '@arcodic.studio', icon: <Instagram size={20} />, color: 'text-pink-500' },
+    { id: 'mail', label: 'Email', value: 'hello@arcodic.com', icon: <Mail size={20} />, color: 'text-indigo-500' }
+  ];
+
+  // Auto-cycle Work
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const timer = setInterval(() => setCurrentDemo((p) => (p + 1) % demos.length), 4000);
+    return () => clearInterval(timer);
   }, []);
 
+  // Auto-cycle Inquiry Contacts (Subtle Flash)
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentContact((p) => (p + 1) % contacts.length), 3500);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => setDispersed(true), 400);
+    const handleMouse = (e) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20,
+      });
+    };
+    window.addEventListener('mousemove', handleMouse);
+    return () => window.removeEventListener('mousemove', handleMouse);
+  }, []);
+
+  const blocks = [
+    { id: 'logo', label: 'ARCODIC', pos: 'top-[4%] left-[4%] w-[38%] h-[30%]', isLogo: true },
+    { id: 'work', label: 'WORK', pos: 'top-[4%] right-[4%] w-[52%] h-[60%]', isWork: true },
+    { id: 'cta', label: 'INQUIRY', pos: 'bottom-[4%] right-[4%] w-[52%] h-[28%]', isContact: true },
+    { id: 'service', label: 'EXPERTISE', pos: 'top-[38%] left-[4%] w-[38%] h-[32%]', icon: <Layers size={28}/>, title: 'Strategic Stack', desc: 'React, SEO, and Performance.' },
+    { id: 'speed', label: 'VELOCITY', pos: 'bottom-[4%] left-[4%] w-[18%] h-[22%]', icon: <Zap size={28}/>, title: '24H Sprints', desc: 'Rapid execution.' },
+    { id: 'social', label: 'CONNECT', pos: 'bottom-[4%] left-[24%] w-[18%] h-[22%]', icon: <Instagram size={28}/>, title: 'Studio Social', desc: '@arcodic.design' },
+  ];
+
   return (
-    <>
-      <nav className={`fixed top-0 w-full z-[60] transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-2 group cursor-pointer z-[70]">
-            <div className={`w-6 h-6 ${ACCENT_BG} flex items-center justify-center`}>
-              <span className="text-white font-black text-[10px]">A</span>
-            </div>
-            <span className="font-black tracking-[0.2em] text-sm uppercase text-white">Arcodic</span>
-          </div>
-          
-          <div className="flex items-center gap-8">
-            <button className="hidden md:block text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
-              Start a Project
-            </button>
-            {/* Burger Icon */}
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              className="z-[70] p-2 text-white hover:opacity-70 transition-opacity"
-            >
-              {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Full-Screen Menu Overlay */}
-      <div className={`fixed inset-0 z-[55] bg-zinc-950 transition-all duration-700 ease-in-out ${isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
-        <div className="flex flex-col justify-center items-center h-full gap-8">
-          {['Expertise', 'Work', 'Process', 'Contact'].map((item, i) => (
-            <a 
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={() => setIsOpen(false)}
-              className="text-5xl md:text-7xl font-black uppercase tracking-tighter hover:italic hover:text-indigo-500 transition-all duration-300"
-              style={{ transitionDelay: `${i * 100}ms` }}
-            >
-              {item}
-            </a>
-          ))}
-          <div className="flex gap-6 mt-12 opacity-50">
-            <Instagram size={20} />
-            <Twitter size={20} />
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-const Hero = () => (
-  <section className="relative min-h-screen flex flex-col justify-center px-6 pt-20 overflow-hidden bg-black">
-    {/* Dynamic Background Color Blobs */}
-    <div className={`absolute top-1/4 -right-20 w-96 h-96 ${ACCENT_BG} opacity-[0.07] rounded-full blur-[120px]`} />
-    <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-600 opacity-[0.05] rounded-full blur-[100px]" />
-
-    <div className="max-w-7xl mx-auto w-full relative z-10">
-      <div className="flex items-center gap-3 mb-8">
-        <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${ACCENT}`}>Based in SA</span>
-        <div className="h-[1px] w-12 bg-zinc-800" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-600 text-nowrap">Serving Globally</span>
-      </div>
+    <div className="h-screen w-full bg-[#050505] overflow-hidden text-white font-sans selection:bg-indigo-500 antialiased">
       
-      <h1 className="text-[12vw] md:text-[8.5vw] font-black leading-[0.85] tracking-tighter mb-12 uppercase">
-        Exceptional <br />
-        <span className="text-transparent" style={{ WebkitTextStroke: '1.5px white' }}>Digital</span> <br />
-        Foundations<span className={ACCENT}>.</span>
-      </h1>
-
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        <p className="text-lg md:text-xl text-zinc-500 leading-relaxed max-w-md">
-          Arcodic Studio partners with visionary founders to build <span className="text-white italic">high-conversion</span> digital platforms. No fluff, just performance.
-        </p>
-        <button className={`${ACCENT_BG} text-white px-10 py-5 font-bold uppercase tracking-widest text-[11px] flex items-center justify-between group hover:scale-105 transition-all max-w-[240px]`}>
-          Let's talk <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
-        </button>
+      {/* Background Mesh */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none transition-transform duration-1000 ease-out"
+           style={{ transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)` }}>
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-800/20 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/10 blur-[150px] rounded-full" />
       </div>
-    </div>
-  </section>
-);
 
-const Expertise = () => {
-  const services = [
-    { icon: Globe, title: "Strategy", color: "hover:border-blue-500" },
-    { icon: Smartphone, title: "Design", color: "hover:border-indigo-500" },
-    { icon: Zap, title: "Dev", color: "hover:border-purple-500" }
-  ];
+      <div className="relative h-full w-full p-8 md:p-12">
+        {blocks.map((block) => {
+          const isActive = activeBlock?.id === block.id;
+          const anyActive = activeBlock !== null;
 
-  return (
-    <section className="py-32 px-6 bg-zinc-950">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-6">
-          {services.map((s, i) => (
-            <div key={i} className={`p-10 bg-black border border-white/5 ${s.color} transition-all duration-500 group relative overflow-hidden`}>
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
-                <s.icon size={40} className={ACCENT} />
+          return (
+            <div
+              key={block.id}
+              onClick={() => !block.isLogo && setActiveBlock(block)}
+              className={`
+                absolute transition-all duration-[1200ms] cubic-bezier(0.19, 1, 0.22, 1) rounded-[40px]
+                ${dispersed ? block.pos : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 opacity-0 scale-50'}
+                ${anyActive && !isActive ? 'scale-[0.94] opacity-10 blur-md pointer-events-none' : 'scale-100 opacity-100'}
+                ${block.isLogo ? 'bg-white text-black z-10' : 'bg-[#0d0d0d] border border-white/5 shadow-2xl cursor-pointer hover:border-white/20'}
+                group overflow-hidden
+              `}
+              style={{ transform: !anyActive ? `perspective(1000px) rotateX(${mousePos.y * 0.05}deg) rotateY(${mousePos.x * -0.05}deg)` : '' }}
+            >
+              {/* WORK BLOCK: Demo Showcase */}
+              {block.isWork && (
+                <div className="absolute inset-0 z-0">
+                  {demos.map((demo, idx) => (
+                    <div key={demo.id} className={`absolute inset-0 transition-opacity duration-1000 ${currentDemo === idx ? 'opacity-40' : 'opacity-0'}`}>
+                      <img src={demo.img} alt="" className="w-full h-full object-cover grayscale" />
+                    </div>
+                  ))}
+                  <div className="absolute bottom-0 left-0 h-1 bg-white/5 w-full">
+                     <div className="h-full bg-indigo-600 transition-all duration-[4000ms] ease-linear" style={{ width: `${((currentDemo + 1) / demos.length) * 100}%` }} />
+                  </div>
+                </div>
+              )}
+
+              {/* INQUIRY BLOCK: Subtle Contact Flashing */}
+              {block.isContact && (
+                <div className="absolute inset-0 z-0 flex items-center justify-center">
+                  {contacts.map((contact, idx) => (
+                    <div key={contact.id} className={`absolute flex items-center gap-4 transition-all duration-1000 ${currentContact === idx ? 'opacity-10 scale-100 blur-none' : 'opacity-0 scale-110 blur-md'}`}>
+                       {contact.icon}
+                       <span className="text-4xl font-black uppercase tracking-tighter opacity-20">{contact.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative z-10 h-full w-full p-10 flex flex-col justify-between">
+                <div className="flex justify-between items-start">
+                  <div className={`transition-all duration-700 ${block.isLogo ? 'text-black' : 'text-indigo-500'}`}>
+                    {block.isContact ? <Send size={24} className="animate-pulse" /> : (block.icon || <div className="font-black text-xl">AR</div>)}
+                  </div>
+                  {!block.isLogo && <ArrowUpRight size={18} className="opacity-0 group-hover:opacity-100 transition-all" />}
+                </div>
+
+                <div className="flex justify-between items-end">
+                  <div>
+                    {/* Dynamic Label for Inquiry */}
+                    {block.isContact && (
+                      <div className="mb-2 h-6 overflow-hidden">
+                        <p className={`text-[10px] font-black tracking-[0.3em] uppercase transition-all duration-500 ${contacts[currentContact].color}`}>
+                          {contacts[currentContact].value}
+                        </p>
+                      </div>
+                    )}
+                    <h2 className={`font-black tracking-tighter uppercase leading-[0.85] ${block.isLogo ? 'text-5xl md:text-7xl' : 'text-sm opacity-40 group-hover:opacity-100'}`}>
+                      {block.label}
+                    </h2>
+                  </div>
+                  
+                  {/* Visual indicator for current active contact */}
+                  {block.isContact && (
+                    <div className="flex gap-1">
+                      {contacts.map((_, i) => (
+                        <div key={i} className={`w-1 h-1 rounded-full transition-all duration-500 ${currentContact === i ? 'bg-indigo-500 w-3' : 'bg-white/10'}`} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-600 mb-4">0{i+1}</h3>
-              <h4 className="text-3xl font-black uppercase mb-4 tracking-tighter">{s.title}</h4>
-              <p className="text-zinc-500 text-sm leading-relaxed">Tailored technical solutions focused on your brand's unique growth metrics.</p>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    </section>
+
+      {/* Popups */}
+      {activeBlock && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 md:p-12">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setActiveBlock(null)} />
+            <div className="relative bg-[#0d0d0d] border border-white/10 w-full max-w-4xl min-h-[500px] rounded-[48px] shadow-3xl overflow-hidden animate-in zoom-in-95 duration-500">
+                <div className="flex h-full flex-col md:flex-row">
+                    <div className="w-full md:w-1/2 p-12 border-b md:border-b-0 md:border-r border-white/5 flex flex-col justify-between bg-black/20 text-center md:text-left">
+                        <div>
+                            <span className="text-[10px] font-black tracking-[0.4em] text-indigo-500 uppercase block mb-6">{activeBlock.label}</span>
+                            <h3 className="text-5xl font-black uppercase tracking-tighter mb-4 leading-none">{activeBlock.isContact ? "Get Connected" : activeBlock.title || "Archive"}</h3>
+                            <p className="text-zinc-500 text-lg">Direct channels to the Arcodic design team.</p>
+                        </div>
+                        <button onClick={() => setActiveBlock(null)} className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-700 hover:text-white transition-colors">Close Window</button>
+                    </div>
+                    
+                    <div className="w-full md:w-1/2 p-12 flex flex-col justify-center gap-4">
+                        {activeBlock.isContact ? (
+                           contacts.map((c) => (
+                              <button key={c.id} className="flex items-center justify-between p-6 bg-white/5 rounded-3xl border border-white/5 hover:border-indigo-500 group transition-all">
+                                 <div className="flex items-center gap-4">
+                                    <div className={c.color}>{c.icon}</div>
+                                    <div className="text-left">
+                                       <p className="text-[10px] font-bold text-zinc-500 uppercase">{c.label}</p>
+                                       <p className="text-sm font-black">{c.value}</p>
+                                    </div>
+                                 </div>
+                                 <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform"/>
+                              </button>
+                           ))
+                        ) : (
+                           <div className="text-center text-zinc-600 uppercase text-[10px] font-black tracking-widest">
+                              Feature under construction
+                           </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
+    </div>
   );
 };
 
-const Work = () => {
-  const projects = [
-    { title: "Noir Atelier", img: "/salon-hero.webp", tag: "Hospitality" },
-    { title: "Roast & Ritual", img: "/coffee-hero.webp", tag: "Commerce" }
-  ];
-
-  return (
-    <section className="py-32 px-6 bg-black">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-end mb-16">
-          <h2 className="text-5xl font-black uppercase tracking-tighter italic">Recent<br />Drops</h2>
-          <button className={`text-[10px] font-bold uppercase tracking-widest border-b-2 border-current pb-1 ${ACCENT}`}>View all</button>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-10">
-          {projects.map((p, i) => (
-            <div key={i} className="group cursor-pointer">
-              <div className="aspect-[16/10] overflow-hidden bg-zinc-900 mb-6 relative">
-                <img 
-                  src={p.img} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070"; }}
-                />
-                <div className="absolute inset-0 bg-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              </div>
-              <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-black uppercase tracking-tight">{p.title}</h3>
-                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{p.tag}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-export default function App() {
-  return (
-    <div className="bg-black text-white selection:bg-indigo-500 font-sans antialiased overflow-x-hidden">
-      <Navbar />
-      <main>
-        <Hero />
-        <Expertise />
-        <Work />
-      </main>
-      <footer className="py-20 px-6 border-t border-white/5 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-700">Arcodic Studio — 2026</p>
-      </footer>
-    </div>
-  );
-}
+export default App;
