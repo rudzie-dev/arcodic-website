@@ -1,180 +1,180 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  ArrowUpRight, 
-  Layers, 
-  Command, 
+  ArrowUpRight,
+  Zap,
+  Shield,
   Smartphone,
-  Instagram,
-  Twitter,
+  Globe,
   Plus,
-  Minus,
-  Sun,
-  Moon,
-  Contrast,
-  Menu,
-  X
+  ArrowRight,
+  Instagram,
+  Twitter
 } from 'lucide-react';
 
-// --- Animated Grain Overlay Component ---
-const GrainOverlay = () => (
-  <div className="fixed inset-0 z-[99] pointer-events-none opacity-[0.03] contrast-150 brightness-100">
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <filter id="noiseFilter">
-        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#noiseFilter)" />
-    </svg>
-  </div>
+// --- Reusable Premium Components ---
+
+const ActionButton = ({ children, primary = false, onClick, className = "" }) => (
+  <button 
+    onClick={onClick}
+    className={`
+      group relative px-8 py-4 overflow-hidden transition-all duration-500
+      ${primary 
+        ? 'bg-white text-black hover:pr-12' 
+        : 'bg-transparent text-white border border-white/10 hover:bg-white/5 hover:border-white/30'}
+      ${className}
+    `}
+  >
+    <span className="relative z-10 flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-[10px]">
+      {children}
+      <ArrowUpRight size={14} className={`transition-all duration-500 ${primary ? 'opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0' : ''}`} />
+    </span>
+  </button>
 );
 
-// --- Background "Aura" Blobs ---
-const BackgroundAura = ({ theme }) => (
-  <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-    <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] transition-colors duration-1000 
-      ${theme === 'dark' ? 'bg-zinc-800/20' : 'bg-zinc-300/30'}`} />
-    <div className={`absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] rounded-full blur-[120px] transition-colors duration-1000 
-      ${theme === 'dark' ? 'bg-zinc-900/40' : 'bg-zinc-200/50'}`} />
-  </div>
-);
-
-export default function App() {
-  const [theme, setTheme] = useState('mixed');
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const toggleTheme = () => {
-    const modes = ['light', 'dark', 'mixed'];
-    setTheme(modes[(modes.indexOf(theme) + 1) % modes.length]);
-  };
-
-  return (
-    <div className={`transition-colors duration-1000 ${theme === 'dark' ? 'bg-[#0a0a0a] text-zinc-100' : 'bg-[#fcfcfc] text-zinc-900'}`}>
-      <GrainOverlay />
-      <BackgroundAura theme={theme} />
-      
-      {/* Custom Cursor Circle (The "Thoughtful" touch) */}
-      <div 
-        className="fixed w-8 h-8 border border-zinc-500 rounded-full pointer-events-none z-[100] transition-transform duration-150 ease-out hidden md:block"
-        style={{ transform: `translate(${mousePos.x - 16}px, ${mousePos.y - 16}px)` }}
-      />
-
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
-      
-      <main className="relative z-10">
-        <Hero theme={theme} />
-        <FeaturedWork theme={theme} />
-        <Services theme={theme} />
-        <Methodology theme={theme} />
-      </main>
-
-      <Footer theme={theme} />
+const FeatureCard = ({ icon: Icon, title, desc }) => (
+  <div className="group p-8 bg-zinc-900/40 border border-white/5 hover:border-white/20 transition-all duration-500 backdrop-blur-sm relative overflow-hidden">
+    <div className="absolute top-0 left-0 w-1 h-0 bg-white transition-all duration-500 group-hover:h-full" />
+    <div className="mb-6 text-zinc-500 group-hover:text-white transition-colors duration-500">
+      <Icon size={24} strokeWidth={1.5} />
     </div>
-  );
-}
+    <h3 className="text-xl font-bold mb-3 tracking-tight">{title}</h3>
+    <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-400 transition-colors">
+      {desc}
+    </p>
+  </div>
+);
 
-const Navbar = ({ theme, toggleTheme }) => {
+// --- Main App Sections ---
+
+const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const scrollHandler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', scrollHandler);
-    return () => window.removeEventListener('scroll', scrollHandler);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'py-4 backdrop-blur-md border-b border-zinc-500/10' : 'py-10'}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <div className="flex items-center gap-4 group">
-          <div className={`w-8 h-8 flex items-center justify-center font-black text-[10px] transition-all duration-500 group-hover:scale-110 ${theme === 'light' ? 'bg-black text-white' : 'bg-white text-black'}`}>
-            AR
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-white flex items-center justify-center">
+            <span className="text-black font-black text-[10px]">A</span>
           </div>
-          <span className="font-bold tracking-[0.2em] text-xs uppercase italic">Arcodic Studio</span>
+          <span className="font-black tracking-[0.2em] text-sm uppercase">Arcodic</span>
         </div>
-
-        <div className="flex items-center gap-6">
-          <button onClick={toggleTheme} className="hover:rotate-45 transition-transform duration-500 p-2">
-            {theme === 'dark' ? <Moon size={18} /> : theme === 'light' ? <Sun size={18} /> : <Contrast size={18} />}
-          </button>
-          <div className="h-4 w-[1px] bg-zinc-500/20" />
-          <button className="text-[10px] font-bold uppercase tracking-[0.2em] border border-zinc-500/30 px-5 py-2 hover:bg-zinc-500/10 transition-colors">
-            Contact
-          </button>
+        
+        <div className="hidden md:flex items-center gap-10">
+          {['Expertise', 'Work', 'Method'].map((item) => (
+            <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">
+              {item}
+            </a>
+          ))}
+          <ActionButton primary className="!py-2.5 !px-6">Inquire</ActionButton>
         </div>
       </div>
     </nav>
   );
 };
 
-const Hero = ({ theme }) => (
-  <section className="min-h-screen flex flex-col justify-center px-6 pt-20">
-    <div className="max-w-7xl mx-auto w-full">
-      <div className="overflow-hidden mb-6">
-        <span className="block text-[10px] font-bold uppercase tracking-[0.5em] opacity-40 animate-fade-in-up">
-          Est. 2024 / South Africa
-        </span>
+const Hero = () => (
+  <section className="relative min-h-screen flex flex-col justify-center px-6 pt-20 overflow-hidden">
+    {/* Animated Background Depth */}
+    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-zinc-800/20 rounded-full blur-[120px] animate-pulse" />
+    <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-zinc-700/10 rounded-full blur-[120px]" />
+
+    <div className="max-w-7xl mx-auto w-full relative z-10">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-8">
+        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Available for Q2 2026</span>
       </div>
       
-      <h1 className="text-[14vw] md:text-[10vw] font-light leading-[0.8] tracking-tighter mb-12">
-        We craft <br />
-        <span className="italic font-serif opacity-40 pr-4">memorable</span>
-        digital art.
+      <h1 className="text-[11vw] md:text-[7.5vw] font-black leading-[0.9] tracking-tighter mb-10 uppercase">
+        Digital <br />
+        <span className="text-transparent border-t-white" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)' }}>Architecture</span> <br />
+        Studio.
       </h1>
 
-      <div className="grid md:grid-cols-12 gap-8 items-end">
-        <div className="md:col-span-5">
-          <p className="text-xl md:text-2xl font-light leading-relaxed opacity-70">
-            A strategic design partner for brands who value precision over speed. We build interfaces that command attention.
-          </p>
-        </div>
-        <div className="md:col-start-9 md:col-span-4">
-          <div className="flex flex-col gap-4 text-[10px] font-bold uppercase tracking-widest opacity-40">
-            <div className="flex justify-between border-b border-zinc-500/20 pb-2">
-              <span>Focus</span>
-              <span>Visual Design / WebGL / UX</span>
-            </div>
-            <div className="flex justify-between border-b border-zinc-500/20 pb-2">
-              <span>Availability</span>
-              <span>Available Q3 2026</span>
-            </div>
-          </div>
+      <div className="grid md:grid-cols-2 gap-12 items-end max-w-5xl">
+        <p className="text-xl text-zinc-400 leading-relaxed italic font-serif">
+          Specializing in high-performance web experiences for brands that demand technical excellence and visual distinction.
+        </p>
+        <div className="flex gap-4">
+          <ActionButton primary onClick={() => window.open('https://wa.me/27676862733')}>Get Started</ActionButton>
+          <ActionButton>View Our Work</ActionButton>
         </div>
       </div>
     </div>
   </section>
 );
 
-const FeaturedWork = ({ theme }) => {
+const Expertise = () => (
+  <section id="expertise" className="py-32 px-6 border-t border-white/5 bg-zinc-950/50">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 block mb-4">Core Capabilities</span>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">Engineered for <br /> Performance.</h2>
+        </div>
+        <p className="max-w-xs text-zinc-500 text-sm leading-relaxed">
+          We combine artistic intuition with technical rigor to build websites that aren't just pretty—they convert.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-1">
+        <FeatureCard 
+          icon={Globe} 
+          title="Digital Strategy" 
+          desc="Aligning your brand goals with a technical roadmap that scales as you grow." 
+        />
+        <FeatureCard 
+          icon={Smartphone} 
+          title="Product Design" 
+          desc="Interface design with a focus on user psychology and conversion optimization." 
+        />
+        <FeatureCard 
+          icon={Zap} 
+          title="Web Development" 
+          desc="Clean, performant React and Framer builds optimized for SEO and speed." 
+        />
+      </div>
+    </div>
+  </section>
+);
+
+const WorkGrid = () => {
   const projects = [
-    { name: "Noir Atelier", cat: "Luxury", img: "/salon-hero.webp", span: "md:col-span-7" },
-    { name: "Roast Ritual", cat: "Culture", img: "/coffee-hero.webp", span: "md:col-span-5" },
-    { name: "MG Installations", cat: "Tech", img: "/installations-hero.webp", span: "md:col-span-12" }
+    { title: "Noir Atelier", cat: "Lifestyle", img: "/salon-hero.webp" },
+    { title: "Roast & Ritual", cat: "Commerce", img: "/coffee-hero.webp" },
+    { title: "MG Installations", cat: "Industrial", img: "/installations-hero.webp" }
   ];
 
   return (
-    <section className="py-32 px-6">
+    <section id="work" className="py-32 px-6 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-end mb-16">
-          <h2 className="text-4xl font-serif italic">Case Studies</h2>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">01 — Selected Work</span>
+        <div className="mb-20">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 block mb-4">Portfolio</span>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">Selected Works</h2>
         </div>
-        
-        <div className="grid md:grid-cols-12 gap-6">
+
+        <div className="grid md:grid-cols-2 gap-8">
           {projects.map((p, i) => (
-            <div key={i} className={`${p.span} group relative overflow-hidden bg-zinc-900 aspect-video md:aspect-auto md:h-[600px]`}>
-              <img 
-                src={p.img} 
-                className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 opacity-80 group-hover:opacity-100"
-                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070"; }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-10 flex flex-col justify-end">
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] mb-2 text-white/60">{p.cat}</span>
-                <h3 className="text-4xl text-white font-serif italic">{p.name}</h3>
-                <div className="mt-4 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white">
-                  <ArrowUpRight size={20} />
+            <div key={i} className={`group cursor-pointer relative overflow-hidden ${i === 2 ? 'md:col-span-2' : ''}`}>
+              <div className="aspect-video overflow-hidden bg-zinc-900 border border-white/5">
+                <img 
+                  src={p.img} 
+                  alt={p.title} 
+                  className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                  onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070"; }}
+                />
+              </div>
+              <div className="mt-6 flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-bold uppercase tracking-tighter">{p.title}</h3>
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{p.cat}</span>
+                </div>
+                <div className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                  <ArrowUpRight size={16} />
                 </div>
               </div>
             </div>
@@ -185,25 +185,42 @@ const FeaturedWork = ({ theme }) => {
   );
 };
 
-const Footer = ({ theme }) => (
-  <footer className={`py-20 px-6 border-t ${theme === 'light' ? 'border-zinc-200' : 'border-zinc-900'}`}>
-    <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-      <div className="text-center md:text-left">
-        <h3 className="text-2xl font-serif italic mb-2">Let's build the future.</h3>
-        <p className="text-xs opacity-40 uppercase tracking-widest font-bold">hello@arcodic.com</p>
+const Footer = () => (
+  <footer className="bg-zinc-950 pt-32 pb-12 px-6 border-t border-white/5">
+    <div className="max-w-7xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-20 mb-32">
+        <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none">
+          Let's <br /> Build.
+        </h2>
+        <div className="flex flex-col justify-end gap-12">
+          <p className="text-2xl text-zinc-400 font-serif italic">A project in mind? Let's discuss the possibilities.</p>
+          <div className="flex flex-col sm:flex-row gap-8">
+            <a href="mailto:hello@arcodic.com" className="text-sm font-bold border-b border-white pb-2 hover:text-zinc-400 transition-colors">hello@arcodic.com</a>
+            <div className="flex gap-6 items-center">
+              <Instagram size={18} className="text-zinc-600 hover:text-white cursor-pointer" />
+              <Twitter size={18} className="text-zinc-600 hover:text-white cursor-pointer" />
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="flex gap-8">
-        {['Instagram', 'LinkedIn', 'Dribbble'].map(link => (
-          <a key={link} href="#" className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 hover:opacity-100 transition-opacity">
-            {link}
-          </a>
-        ))}
+      <div className="flex justify-between items-center pt-12 border-t border-white/5 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-700">
+        <span>© 2026 Arcodic</span>
+        <span>Cape Town, ZA</span>
       </div>
-      <p className="text-[10px] opacity-20 uppercase tracking-[0.2em]">© 2026 Arcodic Studio</p>
     </div>
   </footer>
 );
 
-// ... (Expertise, Methodology components remain conceptually same but with refined typography from Hero) ...
-function Services({theme}) { return <div className="h-20" /> } // Spacer for demo
-function Methodology({theme}) { return <div className="h-20" /> } // Spacer for demo
+export default function App() {
+  return (
+    <div className="bg-[#050505] text-white selection:bg-white selection:text-black font-sans antialiased">
+      <Navbar />
+      <main>
+        <Hero />
+        <Expertise />
+        <WorkGrid />
+      </main>
+      <Footer />
+    </div>
+  );
+}
