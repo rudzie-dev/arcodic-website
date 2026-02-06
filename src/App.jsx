@@ -47,12 +47,10 @@ const App = () => {
     }, 1000);
 
     const handleMouse = (e) => {
-      if (window.innerWidth > 768) {
         setMousePos({
           x: (e.clientX / window.innerWidth - 0.5) * 20,
           y: (e.clientY / window.innerHeight - 0.5) * 20,
         });
-      }
     };
 
     window.addEventListener('mousemove', handleMouse);
@@ -65,12 +63,12 @@ const App = () => {
   }, []);
 
   const blocks = [
-    { id: 'logo', label: 'ARCODIC.', pos: 'md:top-[4vh] md:left-[4vw] md:w-[38vw] md:h-[30vh]', isLogo: true },
-    { id: 'work', label: 'WORK', pos: 'md:top-[4vh] md:right-[4vw] md:w-[50vw] md:h-[60vh]', isWork: true, title: "Portfolio Archive" },
-    { id: 'cta', label: 'INQUIRY', pos: 'md:bottom-[4vh] md:right-[4vw] md:w-[50vw] md:h-[28vh]', isContact: true, title: "Direct Channels" },
-    { id: 'service', label: 'EXPERTISE', pos: 'md:top-[38vh] md:left-[4vw] md:w-[38vw] md:h-[32vh]', icon: <Layers size={28}/>, title: 'Strategic Stack' },
-    { id: 'speed', label: 'VELOCITY', pos: 'md:bottom-[4vh] md:left-[4vw] md:w-[18vw] md:h-[22vh]', icon: <Zap size={28}/>, title: 'The 24H Sprint' },
-    { id: 'social', label: 'CONNECT', pos: 'md:bottom-[4vh] md:left-[24vw] md:w-[18vw] md:h-[22vh]', icon: <Globe size={28}/>, title: 'Global Feed' },
+    { id: 'logo', label: 'ARCODIC.', pos: 'top-[4vh] left-[4vw] w-[38vw] h-[30vh]', isLogo: true },
+    { id: 'work', label: 'WORK', pos: 'top-[4vh] right-[4vw] w-[50vw] h-[60vh]', isWork: true, title: "Portfolio Archive" },
+    { id: 'cta', label: 'INQUIRY', pos: 'bottom-[4vh] right-[4vw] w-[50vw] h-[28vh]', isContact: true, title: "Direct Channels" },
+    { id: 'service', label: 'EXPERTISE', pos: 'top-[38vh] left-[4vw] w-[38vw] h-[32vh]', icon: <Layers size={28}/>, title: 'Strategic Stack' },
+    { id: 'speed', label: 'VELOCITY', pos: 'bottom-[4vh] left-[4vw] w-[18vw] h-[22vh]', icon: <Zap size={28}/>, title: 'The 24H Sprint' },
+    { id: 'social', label: 'CONNECT', pos: 'bottom-[4vh] left-[24vw] w-[18vw] h-[22vh]', icon: <Globe size={28}/>, title: 'Global Feed' },
   ];
 
   const renderPopupContent = () => {
@@ -80,18 +78,18 @@ const App = () => {
         return (
           <div className="grid grid-cols-1 gap-4 w-full animate-in fade-in duration-700">
             {demos.map((d) => (
-              <div key={d.id} className="group flex items-center justify-between p-4 md:p-6 bg-white/[0.03] border border-white/5 rounded-2xl md:rounded-[1.5vw] hover:border-indigo-500/50 transition-all overflow-hidden relative">
+              <div key={d.id} className="group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5vw] hover:border-indigo-500/50 transition-all overflow-hidden relative">
                 <div className={`absolute inset-0 bg-gradient-to-r ${d.color} to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
-                <div className="flex gap-4 md:gap-6 items-center relative z-10">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-zinc-800 rounded-xl overflow-hidden grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700">
+                <div className="flex gap-6 items-center relative z-10">
+                  <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700">
                     <img src={d.img} className="w-full h-full object-cover" alt={d.name} />
                   </div>
                   <div>
-                    <p className="text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-widest">{d.tag}</p>
-                    <h4 className="text-xl md:text-2xl font-black uppercase tracking-tighter">{d.name}</h4>
+                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{d.tag}</p>
+                    <h4 className="text-2xl font-black uppercase tracking-tighter">{d.name}</h4>
                   </div>
                 </div>
-                <ArrowUpRight size={20} className="relative z-10 opacity-20 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight size={24} className="relative z-10 opacity-20 group-hover:opacity-100 transition-opacity" />
               </div>
             ))}
           </div>
@@ -99,38 +97,20 @@ const App = () => {
       case 'cta':
         return (
           <div className="grid grid-cols-1 gap-3 w-full animate-in fade-in duration-700">
-            <div className="mb-2 p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
-                <p className="text-emerald-500 text-[9px] font-black tracking-widest uppercase mb-1 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="mb-4 p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
+                <p className="text-emerald-500 text-[10px] font-black tracking-widest uppercase mb-1 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     Available for Q2
                 </p>
-                <p className="text-zinc-400 text-xs">Direct responses within 2 hours.</p>
+                <p className="text-zinc-400 text-sm">Direct responses within 2 hours.</p>
             </div>
             {contacts.map((c) => (
-              <div key={c.id} className="flex items-center justify-between p-5 bg-white/[0.03] border border-white/5 rounded-2xl group hover:border-white/20 transition-all cursor-pointer">
+              <div key={c.id} className="flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5vw] group hover:border-white/20 transition-all cursor-pointer">
                 <div className="flex items-center gap-4">
                   <div className={c.color}><Send size={18}/></div>
-                  <span className="font-bold text-xs md:text-sm">{c.value}</span>
+                  <span className="font-bold text-sm">{c.value}</span>
                 </div>
                 <ArrowRight size={16} className="opacity-40 group-hover:opacity-100 transition-all"/>
-              </div>
-            ))}
-          </div>
-        );
-      case 'service':
-        return (
-          <div className="grid grid-cols-1 gap-4 w-full">
-            {[
-              { icon: <Code size={20}/>, label: "Full-Stack Dev", desc: "Next.js, TypeScript, and high-performance API integration." },
-              { icon: <Cpu size={20}/>, label: "UI Architecture", desc: "Design systems built for scale and frame-perfect motion." },
-              { icon: <Search size={20}/>, label: "SEO Strategy", desc: "Technical optimization to ensure your brand is discovered." }
-            ].map((s, i) => (
-              <div key={i} className="p-5 md:p-6 bg-white/[0.03] border border-white/5 rounded-2xl flex gap-5">
-                <div className="text-indigo-500 mt-1">{s.icon}</div>
-                <div>
-                    <h4 className="font-black uppercase tracking-tighter text-white mb-1">{s.label}</h4>
-                    <p className="text-xs md:text-sm text-zinc-500">{s.desc}</p>
-                </div>
               </div>
             ))}
           </div>
@@ -141,7 +121,7 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen w-full bg-[#050505] overflow-x-hidden md:overflow-hidden text-white font-sans selection:bg-indigo-500 antialiased">
+    <div className="h-screen w-full bg-[#050505] overflow-hidden text-white font-sans selection:bg-indigo-500 antialiased">
       
       {/* System Status Tray */}
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden md:flex items-center gap-6 px-6 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
@@ -153,7 +133,7 @@ const App = () => {
         <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">{statusTime || "00:00:00"} SAST</span>
       </div>
 
-      <div className="relative h-full w-full flex flex-col md:block p-4 md:p-0 overflow-y-auto md:overflow-visible gap-4">
+      <div className="relative h-full w-full">
         {blocks.map((block) => {
           const isActive = activeBlock?.id === block.id;
           const anyActive = activeBlock !== null;
@@ -163,18 +143,17 @@ const App = () => {
               key={block.id}
               onClick={() => !block.isLogo && setActiveBlock(block)}
               className={`
-                transition-all duration-[1200ms] cubic-bezier(0.19, 1, 0.22, 1) rounded-3xl md:rounded-[2.5vw]
-                md:absolute ${dispersed ? block.pos : 'md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-16 md:h-16 md:opacity-0 md:scale-50'}
-                relative w-full h-[25vh] min-h-[180px]
-                ${block.isLogo ? 'h-[15vh] min-h-[120px] bg-white text-black z-10' : 'bg-[#0d0d0d] border border-white/5 shadow-2xl cursor-pointer'}
-                ${anyActive && !isActive ? 'md:scale-[0.96] md:opacity-10 md:blur-xl pointer-events-none' : 'scale-100 opacity-100'}
+                absolute transition-all duration-[1200ms] cubic-bezier(0.19, 1, 0.22, 1) rounded-[2.5vw]
+                ${dispersed ? block.pos : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 opacity-0 scale-50'}
+                ${anyActive && !isActive ? 'scale-[0.96] opacity-10 blur-xl pointer-events-none' : 'scale-100 opacity-100'}
+                ${block.isLogo ? 'bg-white text-black z-10' : 'bg-[#0d0d0d] border border-white/5 shadow-2xl cursor-pointer'}
                 group overflow-hidden
               `}
               style={{
-                transform: (!anyActive && window.innerWidth > 768) ? `perspective(1000px) rotateX(${mousePos.y * 0.05}deg) rotateY(${mousePos.x * -0.05}deg)` : '',
+                transform: !anyActive ? `perspective(1000px) rotateX(${mousePos.y * 0.05}deg) rotateY(${mousePos.x * -0.05}deg)` : '',
               }}
             >
-              {/* Work Images */}
+              {/* Work Background Images */}
               {block.isWork && (
                 <div className="absolute inset-0 z-0 opacity-40">
                   {demos.map((d, idx) => (
@@ -187,12 +166,12 @@ const App = () => {
               {/* INQUIRY BLOCK: OFFICIAL ICON CORNERS */}
               {block.isContact && (
                 <>
-                  {/* Subtle Brand Glint */}
+                  {/* Subtle Brand Glint Backdrop */}
                   {contacts.map((c, idx) => (
                     <div key={c.id + 'g'} className={`absolute inset-0 transition-opacity duration-1000 ${c.glint} ${currentContact === idx ? 'opacity-100' : 'opacity-0'}`} />
                   ))}
 
-                  {/* LARGE OFFICIAL CORNER ICONS */}
+                  {/* LARGE OFFICIAL CORNER ICONS - ALL IN SAME SPOT */}
                   <div className="absolute -top-10 -right-10 z-0 pointer-events-none">
                      {contacts.map((c, idx) => (
                         <svg 
@@ -209,23 +188,23 @@ const App = () => {
                 </>
               )}
 
-              {/* Content Layer */}
-              <div className="relative z-10 h-full w-full p-6 md:p-[2.5vw] flex flex-col justify-between pointer-events-none">
+              {/* Text and Labels Layer */}
+              <div className="relative z-10 h-full w-full p-[2.5vw] flex flex-col justify-between pointer-events-none">
                 <div className="flex justify-between items-start">
                   <div className={`transition-all duration-700 ${block.isLogo ? 'text-black' : 'text-indigo-500'}`}>
-                    {block.isWork ? <Layout size={20} /> : block.isContact ? <Send size={20} /> : (block.icon || <div className="font-black text-xl italic">AR</div>)}
+                    {block.isWork ? <Layout size={24} /> : block.isContact ? <Send size={24} /> : (block.icon || <div className="font-black text-2xl italic">AR</div>)}
                   </div>
                   {!block.isLogo && <ArrowUpRight size={18} className="opacity-40" />}
                 </div>
 
                 <div className="flex justify-between items-end">
                   <div>
-                    {block.isContact && <div className="mb-2"><p className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors duration-700 ${contacts[currentContact].color}`}>{contacts[currentContact].value}</p></div>}
-                    <h2 className={`font-black tracking-tighter uppercase leading-[0.85] ${block.isLogo ? 'text-4xl md:text-[5vw] italic' : 'text-xl md:text-[1.2vw] opacity-80'}`}>
+                    {block.isContact && <div className="mb-2"><p className={`text-[10px] font-black tracking-[0.3em] uppercase transition-colors duration-700 ${contacts[currentContact].color}`}>{contacts[currentContact].value}</p></div>}
+                    <h2 className={`font-black tracking-tighter uppercase leading-[0.85] ${block.isLogo ? 'text-[5vw] italic' : 'text-[1.2vw] opacity-80'}`}>
                       {block.label}
                     </h2>
                   </div>
-                  {block.isLogo && <span className="text-[10px] font-black tracking-[0.4em] opacity-30 uppercase">CPT / 26</span>}
+                  {block.isLogo && <span className="text-[0.6vw] font-black tracking-[0.4em] opacity-30 uppercase">CPT / 26</span>}
                 </div>
               </div>
             </div>
@@ -235,20 +214,20 @@ const App = () => {
 
       {/* Popup Viewport */}
       {activeBlock && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-8">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-8">
             <div className="absolute inset-0 bg-black/90 backdrop-blur-3xl" onClick={() => setActiveBlock(null)} />
-            <div className="relative bg-[#0d0d0d] border border-white/10 w-full max-w-4xl rounded-3xl md:rounded-[3vw] shadow-3xl overflow-y-auto md:overflow-hidden animate-in zoom-in-95 duration-500 max-h-[90vh]">
+            <div className="relative bg-[#0d0d0d] border border-white/10 w-full max-w-4xl rounded-[3vw] shadow-3xl overflow-hidden animate-in zoom-in-95 duration-500 max-h-[90vh]">
                 <div className="flex flex-col md:flex-row min-h-[50vh]">
-                    <div className="w-full md:w-1/3 p-8 md:p-12 bg-black/40 border-b md:border-b-0 md:border-r border-white/5 flex flex-col justify-between gap-8">
+                    <div className="w-full md:w-1/3 p-12 bg-black/40 border-r border-white/5 flex flex-col justify-between">
                         <div>
-                            <span className="text-[9px] font-black tracking-[0.5em] text-indigo-500 uppercase block mb-4 md:mb-8">{activeBlock.label}</span>
-                            <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">{activeBlock.title || "Selected"}</h3>
+                            <span className="text-[10px] font-black tracking-[0.5em] text-indigo-500 uppercase block mb-8">{activeBlock.label}</span>
+                            <h3 className="text-5xl font-black uppercase tracking-tighter leading-none">{activeBlock.title || "Selected"}</h3>
                         </div>
                         <button onClick={() => setActiveBlock(null)} className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 hover:text-white transition-colors">
                             <X size={14} /> Close
                         </button>
                     </div>
-                    <div className="w-full md:w-2/3 p-8 md:p-12 flex items-center">
+                    <div className="w-full md:w-2/3 p-12 flex items-center">
                         {renderPopupContent()}
                     </div>
                 </div>
