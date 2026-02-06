@@ -2,52 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowUpRight,
   Zap,
-  Shield,
   Smartphone,
   Globe,
-  Plus,
-  ArrowRight,
   Instagram,
-  Twitter
+  Twitter,
+  Menu,
+  X,
+  ArrowRight
 } from 'lucide-react';
 
-// --- Reusable Premium Components ---
-
-const ActionButton = ({ children, primary = false, onClick, className = "" }) => (
-  <button 
-    onClick={onClick}
-    className={`
-      group relative px-8 py-4 overflow-hidden transition-all duration-500
-      ${primary 
-        ? 'bg-white text-black hover:pr-12' 
-        : 'bg-transparent text-white border border-white/10 hover:bg-white/5 hover:border-white/30'}
-      ${className}
-    `}
-  >
-    <span className="relative z-10 flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-[10px]">
-      {children}
-      <ArrowUpRight size={14} className={`transition-all duration-500 ${primary ? 'opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0' : ''}`} />
-    </span>
-  </button>
-);
-
-const FeatureCard = ({ icon: Icon, title, desc }) => (
-  <div className="group p-8 bg-zinc-900/40 border border-white/5 hover:border-white/20 transition-all duration-500 backdrop-blur-sm relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-1 h-0 bg-white transition-all duration-500 group-hover:h-full" />
-    <div className="mb-6 text-zinc-500 group-hover:text-white transition-colors duration-500">
-      <Icon size={24} strokeWidth={1.5} />
-    </div>
-    <h3 className="text-xl font-bold mb-3 tracking-tight">{title}</h3>
-    <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-400 transition-colors">
-      {desc}
-    </p>
-  </div>
-);
-
-// --- Main App Sections ---
+// --- Theme Config ---
+const ACCENT = "text-indigo-500"; // Change to 'text-blue-500' or 'text-emerald-500' for different vibes
+const ACCENT_BG = "bg-indigo-600";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -55,127 +26,141 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-white flex items-center justify-center">
-            <span className="text-black font-black text-[10px]">A</span>
+    <>
+      <nav className={`fixed top-0 w-full z-[60] transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-2 group cursor-pointer z-[70]">
+            <div className={`w-6 h-6 ${ACCENT_BG} flex items-center justify-center`}>
+              <span className="text-white font-black text-[10px]">A</span>
+            </div>
+            <span className="font-black tracking-[0.2em] text-sm uppercase text-white">Arcodic</span>
           </div>
-          <span className="font-black tracking-[0.2em] text-sm uppercase">Arcodic</span>
+          
+          <div className="flex items-center gap-8">
+            <button className="hidden md:block text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
+              Start a Project
+            </button>
+            {/* Burger Icon */}
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="z-[70] p-2 text-white hover:opacity-70 transition-opacity"
+            >
+              {isOpen ? <X size={28} strokeWidth={1.5} /> : <Menu size={28} strokeWidth={1.5} />}
+            </button>
+          </div>
         </div>
-        
-        <div className="hidden md:flex items-center gap-10">
-          {['Expertise', 'Work', 'Method'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">
+      </nav>
+
+      {/* Full-Screen Menu Overlay */}
+      <div className={`fixed inset-0 z-[55] bg-zinc-950 transition-all duration-700 ease-in-out ${isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <div className="flex flex-col justify-center items-center h-full gap-8">
+          {['Expertise', 'Work', 'Process', 'Contact'].map((item, i) => (
+            <a 
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              onClick={() => setIsOpen(false)}
+              className="text-5xl md:text-7xl font-black uppercase tracking-tighter hover:italic hover:text-indigo-500 transition-all duration-300"
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
               {item}
             </a>
           ))}
-          <ActionButton primary className="!py-2.5 !px-6">Inquire</ActionButton>
+          <div className="flex gap-6 mt-12 opacity-50">
+            <Instagram size={20} />
+            <Twitter size={20} />
+          </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 };
 
 const Hero = () => (
-  <section className="relative min-h-screen flex flex-col justify-center px-6 pt-20 overflow-hidden">
-    {/* Animated Background Depth */}
-    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-zinc-800/20 rounded-full blur-[120px] animate-pulse" />
-    <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-zinc-700/10 rounded-full blur-[120px]" />
+  <section className="relative min-h-screen flex flex-col justify-center px-6 pt-20 overflow-hidden bg-black">
+    {/* Dynamic Background Color Blobs */}
+    <div className={`absolute top-1/4 -right-20 w-96 h-96 ${ACCENT_BG} opacity-[0.07] rounded-full blur-[120px]`} />
+    <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-600 opacity-[0.05] rounded-full blur-[100px]" />
 
     <div className="max-w-7xl mx-auto w-full relative z-10">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-8">
-        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Available for Q2 2026</span>
+      <div className="flex items-center gap-3 mb-8">
+        <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${ACCENT}`}>Based in SA</span>
+        <div className="h-[1px] w-12 bg-zinc-800" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-600 text-nowrap">Serving Globally</span>
       </div>
       
-      <h1 className="text-[11vw] md:text-[7.5vw] font-black leading-[0.9] tracking-tighter mb-10 uppercase">
-        Digital <br />
-        <span className="text-transparent border-t-white" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)' }}>Architecture</span> <br />
-        Studio.
+      <h1 className="text-[12vw] md:text-[8.5vw] font-black leading-[0.85] tracking-tighter mb-12 uppercase">
+        Exceptional <br />
+        <span className="text-transparent" style={{ WebkitTextStroke: '1.5px white' }}>Digital</span> <br />
+        Foundations<span className={ACCENT}>.</span>
       </h1>
 
-      <div className="grid md:grid-cols-2 gap-12 items-end max-w-5xl">
-        <p className="text-xl text-zinc-400 leading-relaxed italic font-serif">
-          Specializing in high-performance web experiences for brands that demand technical excellence and visual distinction.
+      <div className="grid md:grid-cols-2 gap-12 items-center">
+        <p className="text-lg md:text-xl text-zinc-500 leading-relaxed max-w-md">
+          Arcodic Studio partners with visionary founders to build <span className="text-white italic">high-conversion</span> digital platforms. No fluff, just performance.
         </p>
-        <div className="flex gap-4">
-          <ActionButton primary onClick={() => window.open('https://wa.me/27676862733')}>Get Started</ActionButton>
-          <ActionButton>View Our Work</ActionButton>
-        </div>
+        <button className={`${ACCENT_BG} text-white px-10 py-5 font-bold uppercase tracking-widest text-[11px] flex items-center justify-between group hover:scale-105 transition-all max-w-[240px]`}>
+          Let's talk <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+        </button>
       </div>
     </div>
   </section>
 );
 
-const Expertise = () => (
-  <section id="expertise" className="py-32 px-6 border-t border-white/5 bg-zinc-950/50">
-    <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 block mb-4">Core Capabilities</span>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">Engineered for <br /> Performance.</h2>
-        </div>
-        <p className="max-w-xs text-zinc-500 text-sm leading-relaxed">
-          We combine artistic intuition with technical rigor to build websites that aren't just pretty—they convert.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-1">
-        <FeatureCard 
-          icon={Globe} 
-          title="Digital Strategy" 
-          desc="Aligning your brand goals with a technical roadmap that scales as you grow." 
-        />
-        <FeatureCard 
-          icon={Smartphone} 
-          title="Product Design" 
-          desc="Interface design with a focus on user psychology and conversion optimization." 
-        />
-        <FeatureCard 
-          icon={Zap} 
-          title="Web Development" 
-          desc="Clean, performant React and Framer builds optimized for SEO and speed." 
-        />
-      </div>
-    </div>
-  </section>
-);
-
-const WorkGrid = () => {
-  const projects = [
-    { title: "Noir Atelier", cat: "Lifestyle", img: "/salon-hero.webp" },
-    { title: "Roast & Ritual", cat: "Commerce", img: "/coffee-hero.webp" },
-    { title: "MG Installations", cat: "Industrial", img: "/installations-hero.webp" }
+const Expertise = () => {
+  const services = [
+    { icon: Globe, title: "Strategy", color: "hover:border-blue-500" },
+    { icon: Smartphone, title: "Design", color: "hover:border-indigo-500" },
+    { icon: Zap, title: "Dev", color: "hover:border-purple-500" }
   ];
 
   return (
-    <section id="work" className="py-32 px-6 bg-black">
+    <section className="py-32 px-6 bg-zinc-950">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-20">
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600 block mb-4">Portfolio</span>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">Selected Works</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {services.map((s, i) => (
+            <div key={i} className={`p-10 bg-black border border-white/5 ${s.color} transition-all duration-500 group relative overflow-hidden`}>
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
+                <s.icon size={40} className={ACCENT} />
+              </div>
+              <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-600 mb-4">0{i+1}</h3>
+              <h4 className="text-3xl font-black uppercase mb-4 tracking-tighter">{s.title}</h4>
+              <p className="text-zinc-500 text-sm leading-relaxed">Tailored technical solutions focused on your brand's unique growth metrics.</p>
+            </div>
+          ))}
         </div>
+      </div>
+    </section>
+  );
+};
 
-        <div className="grid md:grid-cols-2 gap-8">
+const Work = () => {
+  const projects = [
+    { title: "Noir Atelier", img: "/salon-hero.webp", tag: "Hospitality" },
+    { title: "Roast & Ritual", img: "/coffee-hero.webp", tag: "Commerce" }
+  ];
+
+  return (
+    <section className="py-32 px-6 bg-black">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-end mb-16">
+          <h2 className="text-5xl font-black uppercase tracking-tighter italic">Recent<br />Drops</h2>
+          <button className={`text-[10px] font-bold uppercase tracking-widest border-b-2 border-current pb-1 ${ACCENT}`}>View all</button>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-10">
           {projects.map((p, i) => (
-            <div key={i} className={`group cursor-pointer relative overflow-hidden ${i === 2 ? 'md:col-span-2' : ''}`}>
-              <div className="aspect-video overflow-hidden bg-zinc-900 border border-white/5">
+            <div key={i} className="group cursor-pointer">
+              <div className="aspect-[16/10] overflow-hidden bg-zinc-900 mb-6 relative">
                 <img 
                   src={p.img} 
-                  alt={p.title} 
-                  className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070"; }}
                 />
+                <div className="absolute inset-0 bg-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <div className="mt-6 flex justify-between items-center">
-                <div>
-                  <h3 className="text-xl font-bold uppercase tracking-tighter">{p.title}</h3>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{p.cat}</span>
-                </div>
-                <div className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                  <ArrowUpRight size={16} />
-                </div>
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-black uppercase tracking-tight">{p.title}</h3>
+                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{p.tag}</span>
               </div>
             </div>
           ))}
@@ -185,42 +170,18 @@ const WorkGrid = () => {
   );
 };
 
-const Footer = () => (
-  <footer className="bg-zinc-950 pt-32 pb-12 px-6 border-t border-white/5">
-    <div className="max-w-7xl mx-auto">
-      <div className="grid md:grid-cols-2 gap-20 mb-32">
-        <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none">
-          Let's <br /> Build.
-        </h2>
-        <div className="flex flex-col justify-end gap-12">
-          <p className="text-2xl text-zinc-400 font-serif italic">A project in mind? Let's discuss the possibilities.</p>
-          <div className="flex flex-col sm:flex-row gap-8">
-            <a href="mailto:hello@arcodic.com" className="text-sm font-bold border-b border-white pb-2 hover:text-zinc-400 transition-colors">hello@arcodic.com</a>
-            <div className="flex gap-6 items-center">
-              <Instagram size={18} className="text-zinc-600 hover:text-white cursor-pointer" />
-              <Twitter size={18} className="text-zinc-600 hover:text-white cursor-pointer" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex justify-between items-center pt-12 border-t border-white/5 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-700">
-        <span>© 2026 Arcodic</span>
-        <span>Cape Town, ZA</span>
-      </div>
-    </div>
-  </footer>
-);
-
 export default function App() {
   return (
-    <div className="bg-[#050505] text-white selection:bg-white selection:text-black font-sans antialiased">
+    <div className="bg-black text-white selection:bg-indigo-500 font-sans antialiased overflow-x-hidden">
       <Navbar />
       <main>
         <Hero />
         <Expertise />
-        <WorkGrid />
+        <Work />
       </main>
-      <Footer />
+      <footer className="py-20 px-6 border-t border-white/5 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-700">Arcodic Studio — 2026</p>
+      </footer>
     </div>
   );
 }
