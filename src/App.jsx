@@ -19,10 +19,29 @@ const App = () => {
     { id: 3, name: 'MG Installations', tag: 'Technical Services', img: '/installations-hero.webp', color: 'from-blue-500/20' }
   ];
 
+  // Enhanced Contact Data with Glint Colors and SVG patterns
   const contacts = [
-    { id: 'wa', label: 'WhatsApp', value: '+27 67 686 2733', icon: <MessageCircle size={20} />, color: 'text-emerald-500' },
-    { id: 'ig', label: 'Instagram', value: '@arcodic.studio', icon: <Instagram size={20} />, color: 'text-pink-500' },
-    { id: 'mail', label: 'Email', value: 'hello@arcodic.com', icon: <Mail size={20} />, color: 'text-indigo-500' }
+    { 
+        id: 'wa', label: 'WhatsApp', value: '+27 67 686 2733', icon: <MessageCircle size={20} />, 
+        color: 'text-emerald-500', glint: 'bg-emerald-500/10', 
+        svg: (active) => (
+            <svg className={`absolute top-2 left-2 w-8 h-8 transition-all duration-700 ${active ? 'opacity-20 scale-100' : 'opacity-0 scale-50'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><circle cx="12" cy="12" r="10"/><path d="M8 12h8m-4-4v8"/></svg>
+        )
+    },
+    { 
+        id: 'ig', label: 'Instagram', value: '@arcodic.studio', icon: <Instagram size={20} />, 
+        color: 'text-pink-500', glint: 'bg-pink-500/10',
+        svg: (active) => (
+            <svg className={`absolute top-2 left-2 w-8 h-8 transition-all duration-700 ${active ? 'opacity-20 scale-100' : 'opacity-0 scale-50'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+        )
+    },
+    { 
+        id: 'mail', label: 'Email', value: 'hello@arcodic.com', icon: <Mail size={20} />, 
+        color: 'text-indigo-500', glint: 'bg-indigo-500/10',
+        svg: (active) => (
+            <svg className={`absolute top-2 left-2 w-8 h-8 transition-all duration-700 ${active ? 'opacity-20 scale-100' : 'opacity-0 scale-50'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M22 12L2 2l10 20 2-8 8-2z"/></svg>
+        )
+    }
   ];
 
   useEffect(() => {
@@ -62,7 +81,6 @@ const App = () => {
 
   const renderPopupContent = () => {
     if (!activeBlock) return null;
-
     switch (activeBlock.id) {
       case 'work':
         return (
@@ -84,7 +102,6 @@ const App = () => {
             ))}
           </div>
         );
-
       case 'speed':
         return (
           <div className="w-full space-y-6 animate-in slide-in-from-bottom-4 duration-700">
@@ -112,7 +129,6 @@ const App = () => {
             </button>
           </div>
         );
-
       case 'social':
         return (
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 animate-in zoom-in-95 duration-700">
@@ -131,7 +147,6 @@ const App = () => {
             </a>
           </div>
         );
-
       case 'service':
         return (
           <div className="grid grid-cols-1 gap-4 w-full">
@@ -150,7 +165,6 @@ const App = () => {
             ))}
           </div>
         );
-
       case 'cta':
         return (
           <div className="grid grid-cols-1 gap-3 w-full animate-in fade-in duration-700">
@@ -172,7 +186,6 @@ const App = () => {
             ))}
           </div>
         );
-
       default:
         return null;
     }
@@ -180,8 +193,6 @@ const App = () => {
 
   return (
     <div className="h-screen w-full bg-[#050505] overflow-x-hidden md:overflow-hidden text-white font-sans selection:bg-indigo-500 antialiased">
-      
-      {/* System Status Tray (Hidden on Mobile) */}
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden md:flex items-center gap-6 px-6 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -193,9 +204,6 @@ const App = () => {
         <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">Latency: 12ms</span>
       </div>
 
-      {/* Main Grid Container */}
-      {/* ON MOBILE: Relative positioned, Flex column, Scrollable */}
-      {/* ON PC: Full height, Absolute items */}
       <div className="relative h-full w-full flex flex-col md:block p-4 md:p-0 overflow-y-auto md:overflow-visible gap-4">
         {blocks.map((block) => {
           const isActive = activeBlock?.id === block.id;
@@ -207,19 +215,14 @@ const App = () => {
               onClick={() => !block.isLogo && setActiveBlock(block)}
               className={`
                 transition-all duration-[1200ms] cubic-bezier(0.19, 1, 0.22, 1) rounded-3xl md:rounded-[2.5vw]
-                /* PC Layout */
                 md:absolute ${dispersed ? block.pos : 'md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-16 md:h-16 md:opacity-0 md:scale-50'}
-                /* Mobile Layout */
                 relative w-full h-[25vh] min-h-[180px]
                 ${block.isLogo ? 'h-[15vh] min-h-[120px] bg-white text-black z-10' : 'bg-[#0d0d0d] border border-white/5 shadow-2xl cursor-pointer'}
-                /* Active State */
                 ${anyActive && !isActive ? 'md:scale-[0.96] md:opacity-10 md:blur-xl pointer-events-none' : 'scale-100 opacity-100'}
                 group overflow-hidden
               `}
               style={{
-                // Parallax logic restricted to PC
                 transform: (!anyActive && window.innerWidth > 768) ? `perspective(1000px) rotateX(${mousePos.y * 0.05}deg) rotateY(${mousePos.x * -0.05}deg)` : '',
-                boxShadow: (block.isLogo && window.innerWidth > 768) ? `${mousePos.x * -0.5}px ${mousePos.y * -0.5}px 50px rgba(0,0,0,0.2)` : ''
               }}
             >
               {/* Image Background for Work Block */}
@@ -238,19 +241,42 @@ const App = () => {
                 </div>
               )}
 
-              {/* Label cycling for Inquiry Block */}
+              {/* ENHANCED INQUIRY BLOCK CONTENT */}
               {block.isContact && (
-                <div className="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+                <>
+                  {/* Color Glint Overlay */}
                   {contacts.map((c, idx) => (
-                    <span key={c.id} className={`absolute text-3xl md:text-5xl font-black uppercase tracking-tighter transition-all duration-1000 ${currentContact === idx ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>{c.label}</span>
+                    <div 
+                      key={c.id + '_glint'}
+                      className={`absolute inset-0 transition-opacity duration-1000 pointer-events-none ${c.glint} ${currentContact === idx ? 'opacity-100' : 'opacity-0'}`} 
+                    />
                   ))}
-                </div>
+
+                  {/* SVG Tiled Corners */}
+                  <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                    {contacts.map((c, idx) => (
+                        <React.Fragment key={c.id + '_svgs'}>
+                            <div className="absolute top-4 left-4 rotate-0">{c.svg(currentContact === idx)}</div>
+                            <div className="absolute top-4 right-4 rotate-90">{c.svg(currentContact === idx)}</div>
+                            <div className="absolute bottom-4 left-4 -rotate-90">{c.svg(currentContact === idx)}</div>
+                            <div className="absolute bottom-4 right-4 rotate-180">{c.svg(currentContact === idx)}</div>
+                        </React.Fragment>
+                    ))}
+                  </div>
+
+                  {/* Centered Label Background */}
+                  <div className="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+                    {contacts.map((c, idx) => (
+                      <span key={c.id} className={`absolute text-3xl md:text-5xl font-black uppercase tracking-tighter transition-all duration-1000 ${currentContact === idx ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>{c.label}</span>
+                    ))}
+                  </div>
+                </>
               )}
 
               <div className="relative z-10 h-full w-full p-6 md:p-[2.5vw] flex flex-col justify-between pointer-events-none">
                 <div className="flex justify-between items-start">
                   <div className={`transition-all duration-700 ${block.isLogo ? 'text-black' : 'text-indigo-500'}`}>
-                    {block.isWork ? <Layout size={20} /> : block.isContact ? <Send size={20} /> : (block.icon || <div className="font-black text-xl italic leading-none">AR</div>)}
+                    {block.isWork ? <Layout size={20} /> : block.isContact ? <Send size={20} className="animate-bounce" /> : (block.icon || <div className="font-black text-xl italic leading-none">AR</div>)}
                   </div>
                   {!block.isLogo && <ArrowUpRight size={18} className="opacity-40 md:opacity-0 md:group-hover:opacity-100 transition-all" />}
                 </div>
@@ -258,7 +284,7 @@ const App = () => {
                 <div className="flex justify-between items-end">
                   <div>
                     {block.isWork && <div className="mb-2"><p className="text-[9px] font-black tracking-[0.3em] text-indigo-500 uppercase">{demos[currentDemo].name}</p></div>}
-                    {block.isContact && <div className="mb-2"><p className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors ${contacts[currentContact].color}`}>{contacts[currentContact].value}</p></div>}
+                    {block.isContact && <div className="mb-2"><p className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors duration-700 ${contacts[currentContact].color}`}>{contacts[currentContact].value}</p></div>}
                     <h2 className={`font-black tracking-tighter uppercase leading-[0.85] ${block.isLogo ? 'text-4xl md:text-[5vw] italic' : 'text-xl md:text-[1.2vw] opacity-80 md:opacity-40 md:group-hover:opacity-100'}`}>
                       {block.label}
                     </h2>
