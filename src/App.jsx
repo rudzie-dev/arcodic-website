@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, ArrowUpRight, Zap, Send, Layers, Layout, 
   ArrowRight, MessageCircle, Mail, Clock, Globe, AtSign,
-  Code, Cpu, Search
+  Code, Cpu, Search, Twitter, Instagram
 } from 'lucide-react';
 
 const App = () => {
@@ -19,7 +19,6 @@ const App = () => {
     { id: 3, name: 'MG Installations', tag: 'Technical Services', img: '/installations-hero.webp', color: 'from-blue-500/20' }
   ];
 
-  // Official Branding Paths - Standardized to 24x24 viewBox
   const contacts = [
     { 
         id: 'wa', label: 'WhatsApp', value: '+27 67 686 2733', 
@@ -64,12 +63,79 @@ const App = () => {
 
   const blocks = [
     { id: 'logo', label: 'ARCODIC.', pos: 'top-[4vh] left-[4vw] w-[38vw] h-[30vh]', isLogo: true },
-    { id: 'work', label: 'WORK', pos: 'top-[4vh] right-[4vw] w-[50vw] h-[60vh]', isWork: true },
-    { id: 'cta', label: 'INQUIRY', pos: 'bottom-[4vh] right-[4vw] w-[50vw] h-[28vh]', isContact: true },
-    { id: 'service', label: 'EXPERTISE', pos: 'top-[38vh] left-[4vw] w-[38vw] h-[32vh]', icon: <Layers size={28}/> },
-    { id: 'speed', label: 'VELOCITY', pos: 'bottom-[4vh] left-[4vw] w-[18vw] h-[22vh]', icon: <Zap size={28}/> },
-    { id: 'social', label: 'CONNECT', pos: 'bottom-[4vh] left-[24vw] w-[18vw] h-[22vh]', icon: <Globe size={28}/> },
+    { id: 'work', label: 'WORK', pos: 'top-[4vh] right-[4vw] w-[50vw] h-[60vh]', isWork: true, title: "Portfolio Archive" },
+    { id: 'cta', label: 'INQUIRY', pos: 'bottom-[4vh] right-[4vw] w-[50vw] h-[28vh]', isContact: true, title: "Direct Channels" },
+    { id: 'service', label: 'EXPERTISE', pos: 'top-[38vh] left-[4vw] w-[38vw] h-[32vh]', icon: <Layers size={28}/>, title: 'Strategic Stack' },
+    { id: 'speed', label: 'VELOCITY', pos: 'bottom-[4vh] left-[4vw] w-[18vw] h-[22vh]', icon: <Zap size={28}/>, title: 'The 24H Sprint' },
+    { id: 'social', label: 'CONNECT', pos: 'bottom-[4vh] left-[24vw] w-[18vw] h-[22vh]', icon: <Globe size={28}/>, title: 'Global Feed' },
   ];
+
+  const renderPopupContent = () => {
+    if (!activeBlock) return null;
+    switch (activeBlock.id) {
+      case 'work':
+        return (
+          <div className="grid grid-cols-1 gap-4 w-full animate-in fade-in duration-700">
+            {demos.map((d) => (
+              <div key={d.id} className="group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5vw] hover:border-indigo-500/50 transition-all overflow-hidden relative">
+                <div className={`absolute inset-0 bg-gradient-to-r ${d.color} to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <div className="flex gap-6 items-center relative z-10">
+                  <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden grayscale-[0.4] group-hover:grayscale-0 transition-all duration-700">
+                    <img src={d.img} className="w-full h-full object-cover" alt={d.name} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{d.tag}</p>
+                    <h4 className="text-2xl font-black uppercase tracking-tighter">{d.name}</h4>
+                  </div>
+                </div>
+                <ArrowUpRight size={24} className="relative z-10 opacity-20 group-hover:opacity-100 transition-opacity" />
+              </div>
+            ))}
+          </div>
+        );
+      case 'cta':
+        return (
+          <div className="grid grid-cols-1 gap-3 w-full animate-in fade-in duration-700">
+            <div className="mb-4 p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
+                <p className="text-emerald-500 text-[10px] font-black tracking-widest uppercase mb-1 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Available for Q2
+                </p>
+                <p className="text-zinc-400 text-sm">Direct responses within 2 hours.</p>
+            </div>
+            {contacts.map((c) => (
+              <div key={c.id} className="flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5vw] group hover:border-white/20 transition-all cursor-pointer">
+                <div className="flex items-center gap-4">
+                  <div className={c.color}><Send size={18}/></div>
+                  <span className="font-bold text-sm">{c.value}</span>
+                </div>
+                <ArrowRight size={16} className="opacity-40 group-hover:opacity-100 transition-all"/>
+              </div>
+            ))}
+          </div>
+        );
+      case 'service':
+        return (
+          <div className="grid grid-cols-1 gap-4 w-full">
+            {[
+              { icon: <Code size={20}/>, label: "Full-Stack Dev", desc: "Next.js, TypeScript, and high-performance API integration." },
+              { icon: <Cpu size={20}/>, label: "UI Architecture", desc: "Design systems built for scale and frame-perfect motion." },
+              { icon: <Search size={20}/>, label: "SEO Strategy", desc: "Technical optimization to ensure your brand is discovered." }
+            ].map((s, i) => (
+              <div key={i} className="p-6 bg-white/[0.03] border border-white/5 rounded-[1.5vw] flex gap-5">
+                <div className="text-indigo-500 mt-1">{s.icon}</div>
+                <div>
+                    <h4 className="font-black uppercase tracking-tighter text-white mb-1">{s.label}</h4>
+                    <p className="text-sm text-zinc-500">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="h-screen w-full bg-[#050505] overflow-hidden text-white font-sans selection:bg-indigo-500 antialiased">
@@ -103,15 +169,22 @@ const App = () => {
                 transform: !anyActive ? `perspective(1000px) rotateX(${mousePos.y * 0.05}deg) rotateY(${mousePos.x * -0.05}deg)` : '',
               }}
             >
-              {/* INQUIRY BLOCK: CORRECTED ICON POSITIONING */}
+              {/* WORK BLOCK: Images restored */}
+              {block.isWork && (
+                <div className="absolute inset-0 z-0 opacity-40">
+                  {demos.map((d, idx) => (
+                    <img key={d.id} src={d.img} className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${currentDemo === idx ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`} alt="" />
+                  ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-transparent" />
+                </div>
+              )}
+
+              {/* INQUIRY BLOCK: Official Logos anchored correctly */}
               {block.isContact && (
                 <div className="absolute inset-0 z-0 pointer-events-none">
-                  {/* Subtle Brand Glint */}
                   {contacts.map((c, idx) => (
                     <div key={c.id + 'g'} className={`absolute inset-0 transition-opacity duration-1000 ${c.glint} ${currentContact === idx ? 'opacity-100' : 'opacity-0'}`} />
                   ))}
-
-                  {/* LARGE OFFICIAL CORNER ICONS - Perfectly anchored to top-right */}
                   <div className="absolute -top-12 -right-12">
                      {contacts.map((c, idx) => (
                         <svg 
@@ -128,7 +201,7 @@ const App = () => {
                 </div>
               )}
 
-              {/* Text Layer */}
+              {/* Content Layer (Labels/Icons) */}
               <div className="relative z-10 h-full w-full p-[2.5vw] flex flex-col justify-between pointer-events-none">
                 <div className="flex justify-between items-start">
                   <div className={`transition-all duration-700 ${block.isLogo ? 'text-black' : 'text-indigo-500'}`}>
@@ -139,6 +212,7 @@ const App = () => {
 
                 <div className="flex justify-between items-end">
                   <div>
+                    {block.isWork && <div className="mb-2"><p className="text-[10px] font-black tracking-[0.3em] text-indigo-500 uppercase">{demos[currentDemo].name}</p></div>}
                     {block.isContact && <div className="mb-2"><p className={`text-[10px] font-black tracking-[0.3em] uppercase transition-colors duration-700 ${contacts[currentContact].color}`}>{contacts[currentContact].value}</p></div>}
                     <h2 className={`font-black tracking-tighter uppercase leading-[0.85] ${block.isLogo ? 'text-[5vw] italic' : 'text-[1.2vw] opacity-80'}`}>
                       {block.label}
@@ -151,6 +225,27 @@ const App = () => {
           );
         })}
       </div>
+
+      {/* Popups (Restored Logic) */}
+      {activeBlock && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-8">
+            <div className="absolute inset-0 bg-black/90 backdrop-blur-3xl" onClick={() => setActiveBlock(null)} />
+            <div className="relative bg-[#0d0d0d] border border-white/10 w-full max-w-4xl rounded-[3vw] shadow-3xl overflow-hidden animate-in zoom-in-95 duration-500 max-h-[90vh]">
+                <div className="flex flex-col md:flex-row min-h-[50vh]">
+                    <div className="w-full md:w-1/3 p-12 bg-black/40 border-r border-white/5 flex flex-col justify-between">
+                        <div>
+                            <span className="text-[10px] font-black tracking-[0.5em] text-indigo-500 uppercase block mb-8">{activeBlock.label}</span>
+                            <h3 className="text-5xl font-black uppercase tracking-tighter leading-none">{activeBlock.title || "Selected"}</h3>
+                        </div>
+                        <button onClick={() => setActiveBlock(null)} className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 hover:text-white transition-colors">
+                            <X size={14} /> Close
+                        </button>
+                    </div>
+                    <div className="w-full md:w-2/3 p-12 flex items-center">{renderPopupContent()}</div>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
