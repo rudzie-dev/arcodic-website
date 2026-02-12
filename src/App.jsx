@@ -1,77 +1,64 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Plus, 
   Trash2, 
   Printer, 
-  Edit3, 
+  Lock, 
+  Unlock, 
   Save, 
-  Upload, 
   LogOut, 
   ChevronLeft, 
   Eye, 
   PenTool,
-  Search
+  Search,
+  LayoutDashboard,
+  FileText,
+  History,
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 
-// --- Constants & Utilities ---
+// --- CONFIGURATION & CONSTANTS ---
+const SITE_PASSWORD = "URfavraut1";
+const APP_VERSION = "2.1.0-mg-pro";
+const STORAGE_KEY = 'mg_invoice_history_v2';
+const LAST_NUM_KEY = 'mg_last_inv_num';
 
-const AUTH_KEY = "URfavraut1";
-const STORAGE_KEY = "invoicify_data_v1";
-
-const generateId = () => Math.random().toString(36).substr(2, 9);
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-};
-
-const formatCurrency = (amount, currency = 'USD') => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-};
-
-const defaultInvoiceState = {
-  id: '',
-  invoiceNumber: 'INV-001',
-  date: new Date().toISOString().split('T')[0],
-  dueDate: '',
-  currency: 'USD',
-  taxRate: 10,
-  logoUrl: '',
-  status: 'draft',
-  sender: {
-    name: 'MG Installations',
-    email: 'contact@mginstallations.com',
-    address: '123 Premium Way, Design District',
-    phone: '+1 (555) 000-0000',
+const initialInvoiceData = {
+  companyInfo: {
+    name: "MG INSTALLATIONS",
+    address: "21 King Street, 19 Kingsgate Centre",
+    city: "CBD, uMnambithi, 3370",
+    email: "matchlessgifts888@gmail.com",
+    phone: "+27 (0) 00 000 0000"
   },
-  client: {
-    name: '',
-    email: '',
-    address: '',
-    phone: '',
+  clientInfo: {
+    name: "CLIENT NAME / COMPANY",
+    idNumber: "",
+    address: "Client Street Address",
+    city: "Client City, Code",
+  },
+  invoiceDetails: {
+    number: "INV-2026-0001",
+    date: new Date().toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' }),
+    currency: "ZAR"
   },
   items: [
-    { id: generateId(), description: 'Installation Services', quantity: 1, price: 1000 },
+    { id: crypto.randomUUID(), description: "High-grade security system installation...", qty: 1, rate: 0 },
   ],
-  notes: 'Thank you for choosing MG Installations.',
+  discountAmount: 0.00,
+  bankDetails: {
+    bankName: "FNB/RMB",
+    accountName: "Renata Raut",
+    accountNumber: "63172829823",
+    branchCode: "250655",
+    reference: "INV-2026-0001"
+  }
 };
 
-// --- Custom Components ---
-
+// --- Assets ---
 const LotusLogo = ({ className = "w-12 h-12", color = "text-amber-500" }) => (
-  <svg 
-    viewBox="0 0 100 100" 
-    className={`${className} ${color}`} 
-    fill="currentColor" 
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 0 100 100" className={`${className} ${color}`} fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path d="M50 25 C50 25 35 45 25 55 C15 65 10 75 10 75 C10 75 25 70 50 85 C75 70 90 75 90 75 C90 75 85 65 75 55 C65 45 50 25 50 25 Z" opacity="0.9"/>
     <path d="M50 85 C50 85 40 70 30 65 C20 60 10 55 10 55 C10 55 20 65 30 75 C40 85 50 95 50 95 C50 95 60 85 70 75 C80 65 90 55 90 55 C90 55 80 60 70 65 C60 70 50 85 50 85 Z" opacity="0.7"/>
     <path d="M50 20 C50 20 55 40 65 50 C75 60 85 60 85 60 C85 60 75 50 65 35 C60 30 50 20 50 20 Z" opacity="0.6" />
@@ -79,694 +66,674 @@ const LotusLogo = ({ className = "w-12 h-12", color = "text-amber-500" }) => (
   </svg>
 );
 
-/**
- * Login Screen
- */
-const LoginScreen = ({ onLogin }) => {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (password === AUTH_KEY) {
-      onLogin();
-    } else {
-      setError('Invalid Access Key');
-      setPassword('');
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="bg-white rounded-t-2xl rounded-b-lg shadow-2xl overflow-hidden max-w-md w-full flex flex-col border-t-4 border-amber-500">
-        <div className="bg-slate-900 p-10 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm border border-white/10">
-              <LotusLogo className="w-12 h-12" color="text-amber-400" />
-            </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">MG Installations</h1>
-            <p className="text-slate-400 mt-2 text-sm uppercase tracking-widest font-medium">Workspace for Rudra</p>
-          </div>
-        </div>
-        <div className="p-10 bg-white">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Security Access</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-none border-b-2 border-slate-200 focus:border-amber-500 bg-slate-50 focus:bg-white transition-all outline-none text-lg text-slate-800 placeholder-slate-400"
-                placeholder="Enter Passkey"
-                autoFocus
-              />
-            </div>
-            {error && <p className="text-red-500 text-sm text-center font-medium bg-red-50 py-2 rounded border border-red-100">{error}</p>}
-            <button
-              type="submit"
-              className="w-full bg-slate-900 text-white py-4 rounded-lg font-bold hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-            >
-              Verify Identity & Enter
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Main Application Component
- */
 export default function App() {
+  // --- STATE ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [view, setView] = useState('dashboard'); // dashboard, builder
-  const [invoices, setInvoices] = useState([]);
-  const [currentInvoice, setCurrentInvoice] = useState(null);
-  const fileInputRef = useRef(null);
+  const [showNumberPicker, setShowNumberPicker] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [startingNumber, setStartingNumber] = useState("1");
+  const [loginError, setLoginError] = useState(false);
+
+  const [viewMode, setViewMode] = useState('dashboard'); // dashboard, invoice, receipt
+  const [invoice, setInvoice] = useState(initialInvoiceData);
+  const [history, setHistory] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Load data on mount
+  const [isDeleting, setIsDeleting] = useState(null);
+  const [deletePin, setDeletePin] = useState("");
+  const [deleteError, setDeleteError] = useState(false);
+
+  // --- LOGIC ---
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      setInvoices(JSON.parse(savedData));
-    }
-    const sessionAuth = sessionStorage.getItem('invoicify_auth');
-    if (sessionAuth === 'true') setIsAuthenticated(true);
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) setHistory(JSON.parse(data));
   }, []);
 
-  // Save data on change
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
-  }, [invoices]);
+  const generateNextNumber = useCallback(() => {
+    const lastNum = parseInt(localStorage.getItem(LAST_NUM_KEY) || "0");
+    const nextNum = lastNum + 1;
+    const formattedNum = nextNum.toString().padStart(4, '0');
+    const newID = `INV-2026-${formattedNum}`;
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    sessionStorage.setItem('invoicify_auth', 'true');
+    setInvoice(prev => ({
+      ...prev,
+      invoiceDetails: { ...prev.invoiceDetails, number: newID },
+      bankDetails: { ...prev.bankDetails, reference: newID }
+    }));
+  }, []);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (passwordInput === SITE_PASSWORD) {
+      setShowNumberPicker(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+      setPasswordInput("");
+    }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('invoicify_auth');
+  const finalizeLogin = (e) => {
+    e.preventDefault();
+    const startNum = parseInt(startingNumber) || 1;
+    localStorage.setItem(LAST_NUM_KEY, (startNum - 1).toString());
+    generateNextNumber();
+    setIsAuthenticated(true);
+  };
+
+  const saveToHistory = async () => {
+    setIsSaving(true);
+    const subtotal = invoice.items.reduce((acc, item) => acc + (item.qty * item.rate), 0);
+    const total = subtotal - invoice.discountAmount;
+    
+    const entry = {
+      id: Date.now(),
+      type: viewMode === 'receipt' ? 'Receipt' : 'Invoice',
+      number: invoice.invoiceDetails.number,
+      client: invoice.clientInfo.name,
+      date: invoice.invoiceDetails.date,
+      amount: total,
+      data: { ...invoice }
+    };
+
+    const updatedHistory = [entry, ...history.filter(h => h.number !== entry.number)];
+    setHistory(updatedHistory);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+    
+    // Update last number if it's new
+    const parts = invoice.invoiceDetails.number.split('-');
+    const currentSeq = parseInt(parts[parts.length - 1]);
+    if (!isNaN(currentSeq)) {
+        localStorage.setItem(LAST_NUM_KEY, currentSeq.toString());
+    }
+    
+    setTimeout(() => setIsSaving(false), 600);
+  };
+
+  const handleConfirmDelete = (e) => {
+    e.preventDefault();
+    if (deletePin === SITE_PASSWORD) {
+      const updated = history.filter(item => item.id !== isDeleting);
+      setHistory(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      setIsDeleting(null);
+      setDeletePin("");
+      setDeleteError(false);
+    } else {
+      setDeleteError(true);
+      setDeletePin("");
+    }
   };
 
   const handleCreateNew = () => {
-    const newInvoice = { ...defaultInvoiceState, id: generateId(), items: [{ ...defaultInvoiceState.items[0], id: generateId() }] };
-    setCurrentInvoice(newInvoice);
-    setView('builder');
+    generateNextNumber();
+    setInvoice({ ...initialInvoiceData, items: [{ ...initialInvoiceData.items[0], id: crypto.randomUUID() }] });
+    setViewMode('invoice');
+    setIsEditing(true);
   };
 
-  const handleEdit = (invoice) => {
-    setCurrentInvoice(JSON.parse(JSON.stringify(invoice))); // Deep copy
-    setView('builder');
+  const loadFromHistory = (entry) => {
+    setInvoice(entry.data);
+    setViewMode(entry.type.toLowerCase());
+    setIsEditing(false);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this invoice?')) {
-      setInvoices(invoices.filter((inv) => inv.id !== id));
-    }
+  const handlePrint = async () => {
+    await saveToHistory();
+    window.print();
   };
 
-  const handleSaveInvoice = (invoice) => {
-    const existingIndex = invoices.findIndex((inv) => inv.id === invoice.id);
-    if (existingIndex >= 0) {
-      const updated = [...invoices];
-      updated[existingIndex] = invoice;
-      setInvoices(updated);
-    } else {
-      setInvoices([invoice, ...invoices]);
-    }
-    setView('dashboard');
-  };
-
-  // --- Bulk Import Logic ---
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target.result;
-      const delimiter = file.name.endsWith('.csv') ? ',' : '|';
-      parseImportData(text, delimiter);
-    };
-    reader.readAsText(file);
-    e.target.value = null; // Reset input
-  };
-
-  const parseImportData = (text, delimiter) => {
-    try {
-      const lines = text.split('\n');
-      const newInvoices = [];
-      
-      lines.forEach((line) => {
-        if (!line.trim()) return;
-        const cols = line.split(delimiter).map(c => c.trim());
-        if (cols.length < 3) return; // Skip invalid lines
-        if (cols[0].toLowerCase().includes('invoice')) return; // Skip header
-
-        newInvoices.push({
-          ...defaultInvoiceState,
-          id: generateId(),
-          invoiceNumber: cols[0] || `INV-${Math.floor(Math.random()*1000)}`,
-          date: cols[1] || new Date().toISOString().split('T')[0],
-          client: {
-            ...defaultInvoiceState.client,
-            name: cols[2] || 'Unknown Client',
-            email: cols[3] || '',
-          },
-          items: [{
-            id: generateId(),
-            description: 'Imported Service',
-            quantity: 1,
-            price: parseFloat(cols[4]) || 0
-          }]
-        });
-      });
-
-      setInvoices([...newInvoices, ...invoices]);
-      alert(`Successfully imported ${newInvoices.length} invoices.`);
-    } catch (err) {
-      alert('Failed to parse file. Please ensure it uses CSV or Pipe format.');
-    }
-  };
-
-  if (!isAuthenticated) return <LoginScreen onLogin={handleLogin} />;
+  // --- RENDERING HELPERS ---
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl border-t-8 border-amber-500">
+          <div className="p-10 text-center">
+            <div className="bg-slate-900 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl">
+              <LotusLogo className="w-12 h-12" color="text-amber-500" />
+            </div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-2 uppercase">MG Installations</h1>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">Secure System Access</p>
+            
+            {!showNumberPicker ? (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <input 
+                  type="password"
+                  className={`w-full px-6 py-4 rounded-xl bg-slate-50 border-2 transition-all outline-none text-center text-xl font-mono text-slate-900 ${loginError ? 'border-red-500' : 'border-slate-100 focus:border-amber-500'}`}
+                  placeholder="••••••••"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  autoFocus
+                />
+                <button type="submit" className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-800 transition-all shadow-lg">Authenticate</button>
+              </form>
+            ) : (
+              <form onSubmit={finalizeLogin} className="space-y-4">
+                <div className="bg-slate-50 rounded-xl border border-slate-100 p-4">
+                  <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Initialize Sequence</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-slate-400 font-mono text-lg font-bold">INV-2026-</span>
+                    <input type="number" className="bg-transparent text-lg font-mono text-slate-900 font-bold outline-none w-20 border-b-2 border-amber-500" value={startingNumber} onChange={(e) => setStartingNumber(e.target.value)} autoFocus />
+                  </div>
+                </div>
+                <button type="submit" className="w-full bg-amber-500 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-amber-600 transition-all shadow-lg">Begin Session</button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans print:bg-white print:p-0">
+      <style>{`
+        @media print { 
+          .no-print { display: none !important; } 
+          .print-area { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 0 !important; }
+        }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fade 0.4s ease-out forwards; }
+      `}</style>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleting && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 no-print">
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl text-center border border-slate-100">
+             <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-8 h-8" />
+             </div>
+            <h3 className="text-xl font-black uppercase tracking-tight mb-2">Confirm Delete</h3>
+            <p className="text-slate-400 text-xs font-bold uppercase mb-6 tracking-widest">Pin required for removal</p>
+            <input 
+              type="password" 
+              className={`w-full px-4 py-4 rounded-2xl bg-slate-50 border-2 mb-6 outline-none text-center font-mono text-xl ${deleteError ? 'border-red-500' : 'border-slate-100 focus:border-slate-900'}`} 
+              placeholder="••••" 
+              value={deletePin} 
+              onChange={(e) => setDeletePin(e.target.value)} 
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setIsDeleting(null)} className="flex-1 px-4 py-4 rounded-2xl text-[10px] font-black uppercase border border-slate-200 hover:bg-slate-50">Cancel</button>
+              <button onClick={handleConfirmDelete} className="flex-1 px-4 py-4 rounded-2xl text-[10px] font-black uppercase bg-red-600 text-white shadow-lg shadow-red-100 hover:bg-red-700">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 no-print shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20">
-            <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setView('dashboard')}>
-              <div className="bg-slate-800 p-2 rounded-lg border border-slate-700 group-hover:border-amber-500/50 transition-colors">
-                <LotusLogo className="w-8 h-8" color="text-amber-500" />
-              </div>
-              <div>
-                <span className="font-bold text-xl tracking-tight text-white block leading-none">MG Installations</span>
-                <span className="text-xs text-slate-400 uppercase tracking-widest group-hover:text-amber-500 transition-colors">Internal System</span>
-              </div>
+      <nav className="no-print bg-slate-900 sticky top-0 z-50 border-b border-white/5 shadow-xl">
+        <div className="max-w-[1400px] mx-auto px-6 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-4 cursor-pointer" onClick={() => setViewMode('dashboard')}>
+            <div className="bg-white/10 p-2 rounded-xl border border-white/10">
+              <LotusLogo className="w-8 h-8" color="text-amber-500" />
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right hidden sm:block">
-                  <span className="block text-xs text-slate-400 uppercase tracking-wider">Signed in as</span>
-                  <span className="text-sm font-semibold text-white">Welcome, Rudz</span>
-              </div>
-              <div className="h-8 w-px bg-slate-700 mx-2 hidden sm:block"></div>
-              <button 
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+            <div>
+              <h2 className="text-white font-black text-lg tracking-tight leading-none uppercase">MG Installations</h2>
+              <span className="text-[9px] text-white/40 uppercase tracking-[0.2em] font-black">Authorized Portal</span>
             </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="text-right hidden sm:block">
+               <p className="text-[10px] text-white/30 uppercase font-black tracking-widest">Operator</p>
+               <p className="text-white font-bold text-sm">Welcome, Rudz</p>
+            </div>
+            <button 
+              onClick={() => setIsAuthenticated(false)}
+              className="w-10 h-10 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-500 flex items-center justify-center transition-all border border-white/5 hover:border-red-500/20"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {view === 'dashboard' ? (
+      <main className="max-w-[1400px] mx-auto px-6 py-10 no-print">
+        {viewMode === 'dashboard' ? (
           <Dashboard 
-            invoices={invoices} 
+            history={history} 
             onCreate={handleCreateNew} 
-            onEdit={handleEdit} 
-            onDelete={handleDelete}
-            onImport={() => fileInputRef.current.click()}
-            fileInputRef={fileInputRef}
-            handleFileUpload={handleFileUpload}
+            onLoad={loadFromHistory} 
+            onDelete={(id) => setIsDeleting(id)}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
         ) : (
-          <InvoiceBuilder 
-            initialData={currentInvoice} 
-            onSave={handleSaveInvoice} 
-            onBack={() => setView('dashboard')} 
+          <Editor 
+            invoice={invoice} 
+            setInvoice={setInvoice} 
+            viewMode={viewMode} 
+            setViewMode={setViewMode}
+            isEditing={isEditing} 
+            setIsEditing={setIsEditing} 
+            onPrint={handlePrint}
+            isSaving={isSaving}
           />
         )}
       </main>
-    </div>
-  );
-}
 
-/**
- * Dashboard Component
- */
-const Dashboard = ({ invoices, onCreate, onEdit, onDelete, onImport, fileInputRef, handleFileUpload, searchTerm, setSearchTerm }) => {
-  const filteredInvoices = invoices.filter(inv => 
-    inv.client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    inv.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-slate-200 pb-6">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Dashboard</h2>
-          <p className="text-slate-500 mt-1">Overview of recent installation projects and invoices.</p>
-        </div>
-        <div className="flex flex-wrap gap-3 w-full md:w-auto">
-           <div className="relative flex-grow md:flex-grow-0 min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-            <input 
-              type="text" 
-              placeholder="Search clients or invoice #..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 w-full shadow-sm"
-            />
-          </div>
-          <button 
-            onClick={onImport}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-semibold shadow-sm"
-          >
-            <Upload className="w-4 h-4" /> Import Data
-          </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept=".csv,.txt" 
-            onChange={handleFileUpload} 
-          />
-          <button 
-            onClick={onCreate}
-            className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl text-sm font-bold border border-slate-900"
-          >
-            <Plus className="w-4 h-4" /> New Project Invoice
-          </button>
-        </div>
-      </div>
-
-      {invoices.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-slate-300 shadow-sm">
-          <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100">
-            <LotusLogo className="w-10 h-10" color="text-slate-300" />
-          </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">No invoices found</h3>
-          <p className="text-slate-500 max-w-md mx-auto mb-8">Ready to start? Create a new invoice for your next installation project.</p>
-          <button onClick={onCreate} className="text-amber-600 font-bold hover:text-amber-700 underline underline-offset-4">Create First Invoice</button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredInvoices.map((inv) => (
-            <InvoiceCard key={inv.id} invoice={inv} onEdit={onEdit} onDelete={onDelete} />
-          ))}
+      {/* Actual Print Sheet */}
+      {(viewMode === 'invoice' || viewMode === 'receipt') && (
+        <div className="hidden print:block">
+            <PrintSheet invoice={invoice} viewMode={viewMode} />
         </div>
       )}
     </div>
   );
-};
+}
 
-const InvoiceCard = ({ invoice, onEdit, onDelete }) => {
-  const total = invoice.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  const totalWithTax = total + (total * (invoice.taxRate / 100));
+// --- SUB-COMPONENTS ---
+
+const Dashboard = ({ history, onCreate, onLoad, onDelete, searchTerm, setSearchTerm }) => {
+  const formatCurrency = (val) => new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(val);
+  const totalRevenue = history.reduce((a, b) => a + b.amount, 0);
+  
+  const filteredHistory = history.filter(h => 
+    h.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    h.number.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="group bg-white rounded-xl border border-slate-200 p-6 hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-300 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-1.5 h-full bg-slate-900 transition-all"></div>
-      <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-10 transition-opacity">
-        <LotusLogo className="w-24 h-24" color="text-slate-900" />
-      </div>
-      
-      <div className="relative z-10">
-        <div className="flex justify-between items-start mb-6">
-            <div>
-            <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 mb-3 border border-slate-200">
-                {invoice.invoiceNumber}
-            </span>
-            <h3 className="text-lg font-bold text-slate-900 truncate max-w-[200px] leading-tight" title={invoice.client.name}>
-                {invoice.client.name || 'Untitled Client'}
-            </h3>
-            <p className="text-xs text-slate-500 font-medium mt-1">{formatDate(invoice.date)}</p>
-            </div>
-            
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
-            <button onClick={() => onEdit(invoice)} className="p-2 bg-white border border-slate-200 hover:border-amber-500 rounded-lg text-slate-400 hover:text-amber-600 transition-colors shadow-sm" title="Edit">
-                <Edit3 className="w-4 h-4" />
-            </button>
-            <button onClick={() => onDelete(invoice.id)} className="p-2 bg-white border border-slate-200 hover:border-red-500 rounded-lg text-slate-400 hover:text-red-500 transition-colors shadow-sm" title="Delete">
-                <Trash2 className="w-4 h-4" />
-            </button>
-            </div>
+    <div className="animate-fade space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-1">Infrastructure Control</h1>
+          <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Global Account Management</p>
         </div>
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <div className="relative flex-grow md:flex-grow-0 min-w-[300px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
+            <input 
+              type="text" 
+              placeholder="Search Client or Reference..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all shadow-sm"
+            />
+          </div>
+          <button onClick={onCreate} className="px-8 py-3.5 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2">
+            <Plus className="w-4 h-4" /> New Documentation
+          </button>
+        </div>
+      </div>
 
-        <div className="flex justify-between items-end pt-4 border-t border-slate-100">
-            <div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Amount</p>
-            <p className="text-2xl font-bold text-slate-900 tracking-tight">{formatCurrency(totalWithTax, invoice.currency)}</p>
-            </div>
-            <button 
-            onClick={() => onEdit(invoice)} 
-            className="text-xs font-bold text-amber-600 group-hover:text-amber-700 flex items-center gap-1 transition-colors uppercase tracking-wide"
-            >
-            Manage <ChevronLeft className="w-3 h-3 rotate-180" />
-            </button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard label="Total Deployments" value={history.length} icon={<FileText className="w-5 h-5" />} />
+        <StatCard label="Revenue Pool" value={formatCurrency(totalRevenue)} icon={<ShieldCheck className="w-5 h-5" />} dark />
+        <StatCard label="Latest Sync" value={history[0] ? history[0].date : 'N/A'} icon={<History className="w-5 h-5" />} />
+      </div>
+
+      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+           <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Archived Documents</h3>
+           <span className="bg-slate-50 px-3 py-1 rounded-lg text-[10px] font-black text-slate-400">{filteredHistory.length} Matches</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-slate-50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                <th className="px-8 py-5">Reference</th>
+                <th className="px-8 py-5">Client Identity</th>
+                <th className="px-8 py-5">Date Issued</th>
+                <th className="px-8 py-5 text-right">Settlement</th>
+                <th className="px-8 py-5 text-center">Protocol</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filteredHistory.map(item => (
+                <tr key={item.id} className="group hover:bg-slate-50/80 transition-all">
+                  <td className="px-8 py-6 font-mono font-bold text-slate-400">{item.number}</td>
+                  <td className="px-8 py-6">
+                    <p className="font-black text-slate-900 uppercase tracking-tight">{item.client}</p>
+                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${item.type === 'Invoice' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>{item.type}</span>
+                  </td>
+                  <td className="px-8 py-6 font-bold text-slate-500 text-sm">{item.date}</td>
+                  <td className="px-8 py-6 text-right font-black text-slate-900 text-lg">{formatCurrency(item.amount)}</td>
+                  <td className="px-8 py-6 text-center">
+                    <div className="flex justify-center gap-3">
+                      <button onClick={() => onLoad(item)} className="p-2 bg-white border border-slate-200 rounded-xl hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => onDelete(item.id)} className="p-2 bg-white border border-slate-200 rounded-xl hover:border-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm opacity-0 group-hover:opacity-100">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredHistory.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-8 py-20 text-center">
+                    <div className="opacity-20 flex flex-col items-center">
+                      <LotusLogo className="w-20 h-20 grayscale mb-4" />
+                      <p className="text-xs font-black uppercase tracking-widest">No matching records found</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
 
+const StatCard = ({ label, value, icon, dark = false }) => (
+  <div className={`p-8 rounded-[2.5rem] border transition-all shadow-sm ${dark ? 'bg-slate-900 text-white border-slate-800 shadow-slate-200' : 'bg-white text-slate-900 border-slate-200'}`}>
+    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-6 ${dark ? 'bg-white/10' : 'bg-slate-100'}`}>
+      {icon}
+    </div>
+    <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${dark ? 'text-white/40' : 'text-slate-400'}`}>{label}</p>
+    <h3 className="text-3xl font-black tracking-tight">{value}</h3>
+  </div>
+);
 
-/**
- * Invoice Builder Component
- */
-const InvoiceBuilder = ({ initialData, onSave, onBack }) => {
-  const [data, setData] = useState(initialData);
-  const [mode, setMode] = useState('edit'); // edit, preview
-
-  // Calculate totals
-  const subtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  const taxAmount = subtotal * (data.taxRate / 100);
-  const total = subtotal + taxAmount;
-
-  const handlePrint = () => {
-    // Switch to preview mode before printing just in case
-    setMode('preview');
-    setTimeout(() => window.print(), 100);
-  };
-
-  const updateField = (path, value) => {
-    const keys = path.split('.');
-    if (keys.length === 1) {
-      setData({ ...data, [keys[0]]: value });
-    } else {
-      setData({
-        ...data,
-        [keys[0]]: { ...data[keys[0]], [keys[1]]: value }
-      });
-    }
+const Editor = ({ invoice, setInvoice, viewMode, setViewMode, isEditing, setIsEditing, onPrint, isSaving }) => {
+  const updateField = (section, field, value) => {
+    setInvoice(prev => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value }
+    }));
   };
 
   const updateItem = (index, field, value) => {
-    const newItems = [...data.items];
-    newItems[index][field] = value;
-    setData({ ...data, items: newItems });
+    const newItems = [...invoice.items];
+    newItems[index][field] = field === 'description' ? value : parseFloat(value) || 0;
+    setInvoice({ ...invoice, items: newItems });
   };
 
   const addItem = () => {
-    setData({
-      ...data,
-      items: [...data.items, { id: generateId(), description: '', quantity: 1, price: 0 }]
-    });
+    setInvoice({ ...invoice, items: [...invoice.items, { id: crypto.randomUUID(), description: "", qty: 1, rate: 0 }] });
   };
 
   const removeItem = (index) => {
-    if (data.items.length === 1) return;
-    const newItems = data.items.filter((_, i) => i !== index);
-    setData({ ...data, items: newItems });
+    if (invoice.items.length > 1) {
+      setInvoice({ ...invoice, items: invoice.items.filter((_, i) => i !== index) });
+    }
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade flex flex-col items-center gap-10">
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 no-print">
-        <div className="flex items-center gap-3">
-            <button onClick={onBack} className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-500">
-                <ChevronLeft className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-bold text-slate-900">
-                {mode === 'edit' ? 'Editor' : 'Preview'}
-            </h2>
+      <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-4 rounded-3xl border border-slate-200 shadow-xl">
+        <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
+          {['invoice', 'receipt'].map(m => (
+            <button key={m} onClick={() => setViewMode(m)} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${viewMode === m ? "bg-white text-slate-900 shadow-md" : "text-slate-400 hover:text-slate-600"}`}>{m}</button>
+          ))}
         </div>
-        
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="bg-white border border-slate-200 p-1 rounded-lg flex items-center shadow-sm">
-            <button 
-              onClick={() => setMode('edit')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'edit' ? 'bg-amber-50 text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              <PenTool className="w-4 h-4" /> Design
-            </button>
-            <button 
-              onClick={() => setMode('preview')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'preview' ? 'bg-amber-50 text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              <Eye className="w-4 h-4" /> View
-            </button>
-          </div>
 
-          <div className="h-6 w-px bg-slate-300 mx-2 hidden md:block"></div>
-
-          <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-bold shadow-sm">
-            <Printer className="w-4 h-4" /> Print
+        <div className="flex items-center gap-3">
+          {isSaving && <span className="text-[9px] font-black uppercase text-amber-500 animate-pulse">Synchronizing...</span>}
+          <button 
+            onClick={() => setIsEditing(!isEditing)} 
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase border transition-all ${isEditing ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-500 border-slate-200 hover:border-slate-900 hover:text-slate-900"}`}
+          >
+            {isEditing ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+            {isEditing ? "Lock Secure" : "Modify Fields"}
           </button>
-          <button onClick={() => onSave(data)} className="flex items-center gap-2 px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all shadow-md hover:shadow-lg text-sm font-bold border border-slate-900">
-            <Save className="w-4 h-4" /> Save
+          <button 
+            onClick={onPrint} 
+            className="flex items-center gap-2 px-8 py-2.5 bg-amber-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-100"
+          >
+            <Printer className="w-4 h-4" /> Save & Export
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        
-        {/* Editor Sidebar - Only visible in Edit Mode */}
-        {mode === 'edit' && (
-          <div className="w-full lg:w-1/3 space-y-6 no-print order-2 lg:order-1">
-             {/* Configuration Cards */}
-             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2 text-sm uppercase tracking-wider">
-                    <span className="w-1.5 h-4 bg-amber-500 rounded-full"></span>
-                    Invoice Details
-                </h3>
-                <div className="space-y-5">
-                    <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Invoice Number</label>
-                        <input type="text" value={data.invoiceNumber} onChange={(e) => updateField('invoiceNumber', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-medium" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Date</label>
-                            <input type="date" value={data.date} onChange={(e) => updateField('date', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-medium" />
-                        </div>
-                        <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Due Date</label>
-                            <input type="date" value={data.dueDate} onChange={(e) => updateField('dueDate', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all outline-none font-medium" />
-                        </div>
-                    </div>
-                </div>
-             </div>
-
-             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2 text-sm uppercase tracking-wider">
-                    <span className="w-1.5 h-4 bg-amber-500 rounded-full"></span>
-                    Participants
-                </h3>
-                <div className="space-y-5">
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                        <label className="text-xs font-bold text-slate-400 block mb-3 uppercase tracking-wider">Client (Bill To)</label>
-                        <input type="text" placeholder="Client Name" value={data.client.name} onChange={(e) => updateField('client.name', e.target.value)} className="w-full mb-2 p-2 bg-white border border-slate-200 rounded text-sm focus:border-amber-500 outline-none" />
-                        <input type="email" placeholder="Client Email" value={data.client.email} onChange={(e) => updateField('client.email', e.target.value)} className="w-full mb-2 p-2 bg-white border border-slate-200 rounded text-sm focus:border-amber-500 outline-none" />
-                        <textarea placeholder="Address" value={data.client.address} onChange={(e) => updateField('client.address', e.target.value)} className="w-full p-2 bg-white border border-slate-200 rounded text-sm h-20 resize-none focus:border-amber-500 outline-none" />
-                    </div>
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                         <label className="text-xs font-bold text-slate-400 block mb-3 uppercase tracking-wider">Sender (From)</label>
-                         <input type="text" placeholder="Your Company" value={data.sender.name} onChange={(e) => updateField('sender.name', e.target.value)} className="w-full mb-2 p-2 bg-white border border-slate-200 rounded text-sm focus:border-amber-500 outline-none" />
-                         <textarea placeholder="Address" value={data.sender.address} onChange={(e) => updateField('sender.address', e.target.value)} className="w-full p-2 bg-white border border-slate-200 rounded text-sm h-20 resize-none focus:border-amber-500 outline-none" />
-                    </div>
-                </div>
-             </div>
-             
-             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-slate-900 mb-5 flex items-center gap-2 text-sm uppercase tracking-wider">
-                    <span className="w-1.5 h-4 bg-amber-500 rounded-full"></span>
-                    Financial Settings
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Tax Rate (%)</label>
-                        <input type="number" value={data.taxRate} onChange={(e) => updateField('taxRate', parseFloat(e.target.value))} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none" />
-                    </div>
-                    <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Currency</label>
-                        <select value={data.currency} onChange={(e) => updateField('currency', e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="GBP">GBP (£)</option>
-                            <option value="ZAR">ZAR (R)</option>
-                        </select>
-                    </div>
-                </div>
-             </div>
+      <div className="flex flex-col lg:flex-row gap-10 w-full items-start">
+        {/* Workspace Panels (Visible when Editing) */}
+        {isEditing && (
+          <div className="w-full lg:w-[400px] space-y-6 animate-fade no-print">
+            <Panel title="Document Identification">
+               <div className="space-y-4">
+                  <InputField label="Reference ID" value={invoice.invoiceDetails.number} onChange={(v) => updateField('invoiceDetails', 'number', v)} />
+                  <InputField label="Issue Date" type="text" value={invoice.invoiceDetails.date} onChange={(v) => updateField('invoiceDetails', 'date', v)} />
+               </div>
+            </Panel>
+            <Panel title="Client Profile">
+               <div className="space-y-4">
+                  <InputField label="Identity / Name" value={invoice.clientInfo.name} onChange={(v) => updateField('clientInfo', 'name', v)} />
+                  <InputField label="Contact / ID" value={invoice.clientInfo.idNumber} onChange={(v) => updateField('clientInfo', 'idNumber', v)} />
+                  <textarea 
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:border-amber-500 outline-none h-24 resize-none"
+                    value={invoice.clientInfo.address}
+                    onChange={(e) => updateField('clientInfo', 'address', e.target.value)}
+                    placeholder="Physical Address"
+                  />
+               </div>
+            </Panel>
+            <Panel title="Financial Adjustments">
+               <InputField label="Discount / Offset (ZAR)" type="number" value={invoice.discountAmount} onChange={(v) => setInvoice({...invoice, discountAmount: parseFloat(v) || 0})} />
+            </Panel>
           </div>
         )}
 
-        {/* Invoice Preview Canvas */}
-        <div className={`w-full ${mode === 'edit' ? 'lg:w-2/3 order-1 lg:order-2' : 'max-w-4xl mx-auto'}`}>
-            <div className="bg-white shadow-2xl rounded-none sm:rounded-lg overflow-hidden min-h-[1000px] print:shadow-none print:w-full print:h-full print:m-0 print:overflow-visible" id="invoice-preview">
-                {/* Visual Invoice Paper */}
-                <div className="p-8 md:p-16 h-full flex flex-col justify-between relative">
-                    
-                    {/* Decorative Top Bar */}
-                    <div className="absolute top-0 left-0 w-full h-3 bg-slate-900 print:bg-slate-900"></div>
-                    <div className="absolute top-3 left-0 w-full h-1 bg-amber-500 print:bg-amber-500"></div>
-
-                    {/* Header Section */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-16 pt-6">
-                        <div className="flex items-start gap-4">
-                             <div className="text-slate-900 mt-1">
-                                <LotusLogo className="w-16 h-16" color="text-amber-500" />
-                             </div>
-                             <div>
-                                <div className="text-3xl font-extrabold tracking-tight text-slate-900 mb-1 uppercase">
-                                    {data.sender.name}
-                                </div>
-                                <div className="text-xs font-medium text-amber-600 uppercase tracking-widest mb-4">Professional Services</div>
-                                <div className="text-sm text-slate-500 whitespace-pre-line leading-relaxed max-w-xs">
-                                    {data.sender.address}
-                                    {data.sender.phone && <div className="mt-1 font-medium text-slate-700">{data.sender.phone}</div>}
-                                    {data.sender.email && <div className="font-medium text-slate-700">{data.sender.email}</div>}
-                                </div>
-                             </div>
-                        </div>
-                        <div className="mt-10 md:mt-0 text-right">
-                            <h1 className="text-6xl font-thin text-slate-100 uppercase tracking-tighter mb-6 select-none print:text-slate-200">Invoice</h1>
-                            <div className="flex flex-col gap-2 items-end">
-                                <div className="flex items-center gap-4 text-sm">
-                                    <span className="text-slate-400 font-bold uppercase tracking-wider text-xs">Date</span>
-                                    <span className="font-bold text-slate-900 min-w-[100px]">{formatDate(data.date)}</span>
-                                </div>
-                                <div className="flex items-center gap-4 text-sm">
-                                    <span className="text-slate-400 font-bold uppercase tracking-wider text-xs">Invoice No</span>
-                                    <span className="font-bold text-slate-900 min-w-[100px]">{data.invoiceNumber}</span>
-                                </div>
-                                {data.dueDate && (
-                                    <div className="flex items-center gap-4 text-sm mt-2 pt-2 border-t border-slate-100">
-                                        <span className="text-amber-600 font-bold uppercase tracking-wider text-xs">Due Date</span>
-                                        <span className="font-bold text-slate-900 min-w-[100px]">{formatDate(data.dueDate)}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Client Section */}
-                    <div className="mb-16 bg-slate-50 p-6 rounded-lg border-l-4 border-amber-500 print:bg-transparent print:p-0 print:border-none">
-                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Bill To</div>
-                        <div className="text-2xl font-bold text-slate-900 mb-2">{data.client.name || 'Client Name'}</div>
-                        <div className="text-sm text-slate-600 whitespace-pre-line leading-relaxed max-w-lg">
-                            {data.client.address || 'Client Address'}
-                            {data.client.email && <div className="mt-2 font-medium text-amber-600">{data.client.email}</div>}
-                        </div>
-                    </div>
-
-                    {/* Items Table */}
-                    <div className="flex-grow">
-                        <table className="w-full mb-8">
-                            <thead>
-                                <tr className="border-b-2 border-slate-900">
-                                    <th className="text-left py-4 text-xs font-extrabold text-slate-900 uppercase tracking-widest w-1/2">Description</th>
-                                    <th className="text-center py-4 text-xs font-extrabold text-slate-900 uppercase tracking-widest w-24">Qty</th>
-                                    <th className="text-right py-4 text-xs font-extrabold text-slate-900 uppercase tracking-widest w-32">Price</th>
-                                    <th className="text-right py-4 text-xs font-extrabold text-slate-900 uppercase tracking-widest w-32">Total</th>
-                                    {mode === 'edit' && <th className="w-10 no-print"></th>}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {data.items.map((item, index) => (
-                                    <tr key={item.id} className="group hover:bg-slate-50 transition-colors">
-                                        <td className="py-5 align-top">
-                                            {mode === 'edit' ? (
-                                                <input 
-                                                    type="text" 
-                                                    value={item.description} 
-                                                    onChange={(e) => updateItem(index, 'description', e.target.value)}
-                                                    className="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-amber-500 outline-none transition-colors font-medium text-slate-800"
-                                                    placeholder="Item Description"
-                                                />
-                                            ) : (
-                                                <span className="font-bold text-slate-800 text-sm">{item.description}</span>
-                                            )}
-                                        </td>
-                                        <td className="py-5 text-center align-top">
-                                            {mode === 'edit' ? (
-                                                <input 
-                                                    type="number" 
-                                                    value={item.quantity} 
-                                                    onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value))}
-                                                    className="w-full text-center bg-transparent border-b border-dashed border-slate-300 focus:border-amber-500 outline-none transition-colors"
-                                                />
-                                            ) : (
-                                                <span className="text-slate-600 text-sm font-medium">{item.quantity}</span>
-                                            )}
-                                        </td>
-                                        <td className="py-5 text-right align-top text-slate-600">
-                                            {mode === 'edit' ? (
-                                                 <input 
-                                                    type="number" 
-                                                    value={item.price} 
-                                                    onChange={(e) => updateItem(index, 'price', parseFloat(e.target.value))}
-                                                    className="w-full text-right bg-transparent border-b border-dashed border-slate-300 focus:border-amber-500 outline-none transition-colors"
-                                                />
-                                            ) : (
-                                                <span className="text-sm">{formatCurrency(item.price, data.currency)}</span>
-                                            )}
-                                        </td>
-                                        <td className="py-5 text-right align-top font-bold text-slate-900">
-                                            {formatCurrency(item.quantity * item.price, data.currency)}
-                                        </td>
-                                        {mode === 'edit' && (
-                                            <td className="py-5 text-center align-top no-print">
-                                                <button onClick={() => removeItem(index)} className="text-slate-300 hover:text-red-500 transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        )}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        {mode === 'edit' && (
-                            <button onClick={addItem} className="no-print flex items-center gap-2 text-amber-600 text-sm font-bold hover:bg-amber-50 px-4 py-3 rounded-lg transition-colors mb-8 border border-amber-100 hover:border-amber-200">
-                                <Plus className="w-4 h-4" /> Add Item Line
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Totals Section */}
-                    <div className="flex justify-end mt-4">
-                        <div className="w-full sm:w-1/2 lg:w-5/12">
-                            <div className="flex justify-between py-3 text-sm text-slate-600 border-b border-slate-100">
-                                <span className="font-medium">Subtotal</span>
-                                <span className="font-bold text-slate-800">{formatCurrency(subtotal, data.currency)}</span>
-                            </div>
-                            <div className="flex justify-between py-3 text-sm text-slate-600 border-b border-slate-100">
-                                <span className="font-medium">Tax ({data.taxRate}%)</span>
-                                <span className="font-bold text-slate-800">{formatCurrency(taxAmount, data.currency)}</span>
-                            </div>
-                            <div className="flex justify-between py-5 text-xl font-extrabold text-slate-900">
-                                <span>Total</span>
-                                <span className="text-amber-600">{formatCurrency(total, data.currency)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer / Bank Details */}
-                    <div className="mt-16 pt-8 border-t-2 border-slate-900 flex flex-col md:flex-row gap-8 justify-between text-xs text-slate-500">
-                        <div className="space-y-1">
-                            <p className="font-bold text-slate-900 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                                Bank Details
-                            </p>
-                            <p className="font-medium">Bank: <span className="text-slate-700">City Central Bank</span></p>
-                            <p className="font-medium">Account Name: <span className="text-slate-700">{data.sender.name}</span></p>
-                            <p className="font-medium">Account No: <span className="text-slate-700">**** **** **** 1234</span></p>
-                        </div>
-                        <div className="md:text-right max-w-xs">
-                             <p className="font-bold text-slate-900 uppercase tracking-widest mb-3">Terms & Conditions</p>
-                             <p className="leading-relaxed">{data.notes || "Please pay within 15 days. Thank you for your business."}</p>
-                             <p className="mt-4 font-bold text-slate-900">MG Installations</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        {/* Live Preview Paper */}
+        <div className={`flex-grow flex justify-center w-full`}>
+           <div className="print-area bg-white w-[210mm] min-h-[297mm] p-[15mm] md:p-[20mm] shadow-2xl border border-slate-100 flex flex-col justify-between overflow-hidden relative">
+              <PrintSheetContent invoice={invoice} viewMode={viewMode} isEditing={isEditing} updateItem={updateItem} removeItem={removeItem} addItem={addItem} />
+           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const Panel = ({ title, children }) => (
+  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-50 pb-2">{title}</p>
+    {children}
+  </div>
+);
+
+const InputField = ({ label, value, onChange, type = "text" }) => (
+  <div className="space-y-1">
+    <label className="text-[8px] font-black uppercase text-slate-400 ml-1">{label}</label>
+    <input 
+      type={type}
+      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold focus:border-amber-500 transition-all outline-none"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  </div>
+);
+
+const PrintSheetContent = ({ invoice, viewMode, isEditing, updateItem, removeItem, addItem }) => {
+  const subtotal = invoice.items.reduce((acc, item) => acc + (item.qty * item.rate), 0);
+  const total = subtotal - invoice.discountAmount;
+  const formatCurrency = (val) => new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(val);
+
+  return (
+    <>
+      <div className="absolute top-0 left-0 w-full h-2 bg-slate-900 print:bg-slate-900"></div>
+      
+      <div>
+        {/* Header Block */}
+        <div className="flex justify-between items-start mb-20">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+              <LotusLogo className="w-10 h-10" color="text-amber-500" />
+            </div>
+            <div>
+               <h1 className="text-3xl font-black tracking-tighter text-slate-900 leading-none mb-1 uppercase">MG INSTALLATIONS</h1>
+               <div className="flex gap-2">
+                  <span className="text-[9px] font-black uppercase bg-slate-100 text-slate-400 px-2 py-0.5 rounded tracking-widest">Security</span>
+                  <span className="text-[9px] font-black uppercase bg-slate-100 text-slate-400 px-2 py-0.5 rounded tracking-widest">Infrastructure</span>
+               </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <h2 className="text-5xl font-black uppercase tracking-tighter text-slate-900 mb-2 leading-none">{viewMode}</h2>
+            <div className="inline-block bg-slate-900 text-white px-4 py-1.5 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-md">
+              REF {invoice.invoiceDetails.number}
+            </div>
+          </div>
+        </div>
+
+        {/* Stakeholder Info */}
+        <div className="grid grid-cols-2 gap-20 mb-16">
+          <div className="space-y-4">
+             <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 border-l-4 border-slate-900 pl-3">Provider Identity</p>
+             <div className="text-[13px] leading-relaxed text-slate-500 font-semibold">
+                <p className="text-slate-900 font-black text-base">{invoice.companyInfo.name}</p>
+                <p>{invoice.companyInfo.address}</p>
+                <p>{invoice.companyInfo.city}</p>
+                <p className="text-slate-900 font-bold mt-2">{invoice.companyInfo.email}</p>
+                <p>{invoice.companyInfo.phone}</p>
+             </div>
+          </div>
+          <div className="space-y-4">
+             <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 border-l-4 border-amber-500 pl-3">Client Identity</p>
+             <div className="text-[13px] leading-relaxed text-slate-500 font-semibold">
+                <p className="text-slate-900 font-black text-base uppercase">{invoice.clientInfo.name || 'VALUED CUSTOMER'}</p>
+                <p>{invoice.clientInfo.address}</p>
+                <p>{invoice.clientInfo.city}</p>
+                {invoice.clientInfo.idNumber && <p className="text-[9px] font-black text-slate-400 mt-2 uppercase">Reference: {invoice.clientInfo.idNumber}</p>}
+             </div>
+          </div>
+        </div>
+
+        {/* Temporal Data */}
+        <div className="flex gap-16 border-y border-slate-100 py-6 mb-12">
+           <div>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Date Documented</p>
+              <p className="font-black text-slate-900">{invoice.invoiceDetails.date}</p>
+           </div>
+           <div>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Currency</p>
+              <p className="font-black text-slate-900">{invoice.invoiceDetails.currency}</p>
+           </div>
+        </div>
+
+        {/* Itemization */}
+        <table className="w-full mb-10">
+          <thead>
+            <tr className="border-b-2 border-slate-900 text-[10px] font-black uppercase tracking-widest text-slate-900">
+              <th className="text-left py-4 w-[60%]">Operational Description</th>
+              <th className="text-center py-4">Quantity</th>
+              <th className="text-right py-4">Rate</th>
+              <th className="text-right py-4">Total</th>
+              {isEditing && <th className="w-8 no-print"></th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {invoice.items.map((item, i) => (
+              <tr key={item.id} className="group transition-colors">
+                <td className="py-6 pr-10">
+                  {isEditing ? (
+                    <textarea 
+                      className="w-full bg-slate-50 border-b border-slate-100 text-[13px] font-bold p-2 outline-none h-16 resize-none" 
+                      value={item.description} 
+                      onChange={(e) => updateItem(i, 'description', e.target.value)}
+                    />
+                  ) : (
+                    <p className="text-[13px] font-bold text-slate-700 leading-relaxed whitespace-pre-wrap">{item.description}</p>
+                  )}
+                </td>
+                <td className="py-6 text-center align-top">
+                  {isEditing ? (
+                    <input 
+                      type="number" 
+                      className="w-16 text-center bg-slate-50 font-black text-slate-900 border-b" 
+                      value={item.qty} 
+                      onChange={(e) => updateItem(i, 'qty', e.target.value)}
+                    />
+                  ) : (
+                    <span className="font-black text-slate-400 text-sm">{item.qty}</span>
+                  )}
+                </td>
+                <td className="py-6 text-right align-top">
+                  {isEditing ? (
+                    <input 
+                      type="number" 
+                      className="w-24 text-right bg-slate-50 font-black text-slate-900 border-b" 
+                      value={item.rate} 
+                      onChange={(e) => updateItem(i, 'rate', e.target.value)}
+                    />
+                  ) : (
+                    <span className="font-bold text-slate-400 text-sm">{formatCurrency(item.rate)}</span>
+                  )}
+                </td>
+                <td className="py-6 text-right align-top font-black text-slate-900 text-base">
+                  {formatCurrency(item.qty * item.rate)}
+                </td>
+                {isEditing && (
+                  <td className="py-6 text-center align-top no-print">
+                    <button onClick={() => removeItem(i)} className="text-red-200 hover:text-red-600">×</button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {isEditing && (
+          <button onClick={addItem} className="no-print mb-12 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest bg-slate-900 text-white px-5 py-2 rounded-lg hover:scale-105 transition-transform">
+             <Plus className="w-3.5 h-3.5" /> Add Operational Item
+          </button>
+        )}
+
+        {/* Calculation Summary */}
+        <div className="flex justify-end mt-10">
+          <div className="w-full max-w-[340px] space-y-4">
+            <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <span>Gross Total</span>
+              <span>{formatCurrency(subtotal)}</span>
+            </div>
+            {invoice.discountAmount > 0 && (
+              <div className="flex justify-between text-xs font-bold text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-100">
+                <span className="uppercase tracking-widest">Adjustments / Credit</span>
+                <span>- {formatCurrency(invoice.discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-6 border-t-[3px] border-slate-900">
+              <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-900">Settlement Due</span>
+              <span className="text-4xl font-black tracking-tighter text-slate-900">{formatCurrency(total)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Block */}
+      <div className="mt-20 flex flex-col md:flex-row justify-between items-end gap-10 border-t-2 border-slate-900 pt-10">
+         <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 flex-grow max-w-[450px]">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-5 border-b border-white pb-3">Remittance Instructions (EFT)</p>
+            <div className="grid grid-cols-2 gap-y-3 text-[11px] font-bold">
+               <span className="text-slate-300 uppercase">Financial Institution</span>
+               <span className="text-right text-slate-900">{invoice.bankDetails.bankName}</span>
+               <span className="text-slate-300 uppercase">Account Name</span>
+               <span className="text-right text-slate-900">{invoice.bankDetails.accountName}</span>
+               <span className="text-slate-300 uppercase">Account Number</span>
+               <span className="text-right text-slate-900 font-mono text-base">{invoice.bankDetails.accountNumber}</span>
+               <span className="text-slate-300 uppercase">Branch Key</span>
+               <span className="text-right text-slate-900 font-mono">{invoice.bankDetails.branchCode}</span>
+               <span className="text-slate-300 uppercase">Payment Reference</span>
+               <span className="text-right text-amber-600 font-black">{invoice.bankDetails.reference}</span>
+            </div>
+         </div>
+         <div className="text-right">
+            <div className="mb-8">
+              <p className="text-[11px] font-black uppercase text-slate-900">MG INSTALLATIONS</p>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Authorized Electronic Documentation</p>
+            </div>
+            <div className="flex flex-col items-end opacity-20">
+               <LotusLogo className="w-12 h-12 mb-2" color="text-slate-900" />
+               <p className="text-[6px] font-black uppercase tracking-widest">Verified System Ver {APP_VERSION}</p>
+            </div>
+         </div>
+      </div>
+    </>
+  );
+};
+
+const PrintSheet = ({ invoice, viewMode }) => (
+  <div className="bg-white p-0 m-0">
+    <div className="print-area bg-white w-[210mm] min-h-[297mm] p-[20mm] flex flex-col justify-between">
+      <PrintSheetContent invoice={invoice} viewMode={viewMode} isEditing={false} />
+    </div>
+  </div>
+);
