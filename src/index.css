@@ -28,33 +28,6 @@ body {
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
-}
-
-/* Custom cursor */
-.cursor {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-}
-.cursor-dot {
-  width: 8px; height: 8px;
-  background: #fff;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease;
-}
-.cursor-ring {
-  width: 36px; height: 36px;
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: all 0.15s ease;
-}
-body:has(.bento-cell:hover) .cursor-ring {
-  width: 56px; height: 56px;
-  border-color: var(--accent);
 }
 
 /* Grain overlay */

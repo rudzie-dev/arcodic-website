@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X, ArrowUpRight, Zap, Send, Layers, Layout,
   ArrowRight, Code, Cpu, Search, ExternalLink
@@ -27,36 +27,9 @@ const contacts = [
 
 const services = [
   { icon: <Code size={18}/>, label: 'Full-Stack Dev',   desc: 'Next.js, TypeScript & high-performance API architecture.' },
-  { icon: <Cpu size={18}/>,  label: 'UI Architecture', desc: 'Design systems built for scale and frame-perfect motion.' },
-  { icon: <Search size={18}/>, label: 'SEO Strategy',  desc: 'Technical optimisation that ensures your brand gets found.' },
+  { icon: <Cpu size={18}/>,  label: 'UI Architecture',  desc: 'Design systems built for scale and frame-perfect motion.' },
+  { icon: <Search size={18}/>, label: 'SEO Strategy',   desc: 'Technical optimisation that ensures your brand gets found.' },
 ];
-
-const Cursor = () => {
-  const dotRef  = useRef(null);
-  const ringRef = useRef(null);
-  const pos     = useRef({ x: 0, y: 0 });
-  const ring    = useRef({ x: 0, y: 0 });
-  const raf     = useRef(null);
-  useEffect(() => {
-    const move = (e) => { pos.current = { x: e.clientX, y: e.clientY }; };
-    window.addEventListener('mousemove', move);
-    const tick = () => {
-      ring.current.x += (pos.current.x - ring.current.x) * 0.12;
-      ring.current.y += (pos.current.y - ring.current.y) * 0.12;
-      if (dotRef.current)  dotRef.current.style.transform  = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%,-50%)`;
-      if (ringRef.current) ringRef.current.style.transform = `translate(${ring.current.x}px, ${ring.current.y}px) translate(-50%,-50%)`;
-      raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => { window.removeEventListener('mousemove', move); cancelAnimationFrame(raf.current); };
-  }, []);
-  return (
-    <div className="cursor">
-      <div ref={ringRef} className="cursor-ring fixed top-0 left-0" />
-      <div ref={dotRef}  className="cursor-dot  fixed top-0 left-0" />
-    </div>
-  );
-};
 
 export default function App() {
   const [dispersed,      setDispersed]      = useState(false);
@@ -78,11 +51,11 @@ export default function App() {
 
   const blocks = [
     { id: 'logo',    isLogo: true,    pos: { top:'3vh', left:'3vw', width:'34vw', height:'32vh' } },
-    { id: 'work',    isWork: true,    pos: { top:'3vh', right:'3vw', width:'55vw', height:'62vh' },   label:'WORK',      title:'Portfolio' },
+    { id: 'work',    isWork: true,    pos: { top:'3vh', right:'3vw', width:'55vw', height:'62vh' },    label:'WORK',      title:'Portfolio' },
     { id: 'cta',     isContact: true, pos: { bottom:'3vh', right:'3vw', width:'55vw', height:'28vh' }, label:'CONTACT',   title:'Direct Channels' },
-    { id: 'service',                  pos: { top:'39vh', left:'3vw', width:'34vw', height:'30vh' },   label:'EXPERTISE', title:'The Stack' },
-    { id: 'speed',                    pos: { bottom:'3vh', left:'3vw', width:'16vw', height:'21vh' }, label:'24H',       title:'Sprint Delivery' },
-    { id: 'social',                   pos: { bottom:'3vh', left:'21vw', width:'16vw', height:'21vh' }, label:'CONNECT',  title:'Global Feed' },
+    { id: 'service',                  pos: { top:'39vh', left:'3vw', width:'34vw', height:'30vh' },    label:'EXPERTISE', title:'The Stack' },
+    { id: 'speed',                    pos: { bottom:'3vh', left:'3vw', width:'16vw', height:'21vh' },  label:'24H',       title:'Sprint Delivery' },
+    { id: 'social',                   pos: { bottom:'3vh', left:'21vw', width:'16vw', height:'21vh' }, label:'CONNECT',   title:'Global Feed' },
   ];
 
   const anyActive = activeBlock !== null;
@@ -92,22 +65,21 @@ export default function App() {
     switch (activeBlock.id) {
       case 'work': return (
         <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
-          {demos.map((d, i) => (
-            <div key={d.id} style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', overflow:'hidden', transition:'all 0.3s' }}
+          {demos.map((d) => (
+            <div key={d.id}
+              style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', overflow:'hidden', transition:'all 0.3s' }}
               onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'; }}
               onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.05)'; }}>
-              <div style={{ position:'absolute', inset:0, background:`linear-gradient(90deg, ${d.accent}14 0%, transparent 60%)`, opacity:0, transition:'opacity 0.4s' }}
-                onMouseEnter={e=>e.currentTarget.style.opacity=1} />
-              <div style={{ display:'flex', gap:20, alignItems:'center', position:'relative', zIndex:1 }}>
+              <div style={{ display:'flex', gap:20, alignItems:'center' }}>
                 <div style={{ width:64, height:64, borderRadius:12, overflow:'hidden', background:'rgba(255,255,255,0.05)', flexShrink:0 }}>
                   <img src={d.img} alt={d.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 </div>
                 <div>
-                  <p style={{ fontFamily:"'DM Mono', monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:d.accent, marginBottom:6 }}>{d.tag}</p>
-                  <h4 style={{ fontFamily:"'Bebas Neue', sans-serif", fontSize:28, letterSpacing:'0.03em', color:'#fff', margin:0 }}>{d.name}</h4>
+                  <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:d.accent, marginBottom:6, margin:'0 0 6px' }}>{d.tag}</p>
+                  <h4 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:28, letterSpacing:'0.03em', color:'#fff', margin:0 }}>{d.name}</h4>
                 </div>
               </div>
-              <div style={{ width:32, height:32, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', zIndex:1 }}>
+              <div style={{ width:32, height:32, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                 <ArrowUpRight size={14} />
               </div>
             </div>
@@ -117,28 +89,29 @@ export default function App() {
       case 'cta': return (
         <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
           <div style={{ padding:'20px', borderRadius:16, border:'1px solid rgba(52,211,153,0.2)', background:'rgba(52,211,153,0.04)', marginBottom:4 }}>
-            <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'#34d399', display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
-              <span style={{ width:6, height:6, borderRadius:'50%', background:'#34d399', display:'inline-block', animation:'pulse 2s infinite' }} />
+            <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'#34d399', display:'flex', alignItems:'center', gap:8, margin:'0 0 8px' }}>
+              <span style={{ width:6, height:6, borderRadius:'50%', background:'#34d399', display:'inline-block' }} />
               Available — Q2 2025
             </p>
             <p style={{ color:'rgba(255,255,255,0.4)', fontSize:14, margin:0 }}>Direct responses within 2 hours. No agencies, no delays.</p>
           </div>
           {contacts.map((c) => (
-            <div key={c.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', transition:'all 0.3s' }}
-              onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)';e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'}}
-              onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,255,255,0.02)';e.currentTarget.style.borderColor='rgba(255,255,255,0.05)'}}>
+            <div key={c.id}
+              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', transition:'all 0.3s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.05)'; }}>
               <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-                <div style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:`${c.color}14`, border:'1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:`${c.color}14`, border:'1px solid rgba(255,255,255,0.05)', flexShrink:0 }}>
                   <svg viewBox="0 0 24 24" fill="currentColor" style={{ width:16, height:16, color:c.color }}>
                     <path d={c.path} />
                   </svg>
                 </div>
                 <div>
-                  <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', marginBottom:2 }}>{c.label}</p>
+                  <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', margin:'0 0 2px' }}>{c.label}</p>
                   <p style={{ fontSize:14, fontWeight:500, color:'rgba(255,255,255,0.8)', margin:0 }}>{c.value}</p>
                 </div>
               </div>
-              <ArrowRight size={14} style={{ opacity:0.3 }} />
+              <ArrowRight size={14} style={{ opacity:0.3, flexShrink:0 }} />
             </div>
           ))}
         </div>
@@ -172,10 +145,11 @@ export default function App() {
       case 'social': return (
         <div style={{ display:'flex', flexDirection:'column', gap:12, width:'100%' }}>
           {contacts.slice(0,2).map(c => (
-            <div key={c.id} style={{ display:'flex', alignItems:'center', gap:16, padding:'18px 20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', transition:'all 0.3s' }}
-              onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.05)'}}
-              onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,255,255,0.02)'}}>
-              <svg viewBox="0 0 24 24" fill="currentColor" style={{ width:20, height:20, color:c.color }}>
+            <div key={c.id}
+              style={{ display:'flex', alignItems:'center', gap:16, padding:'18px 20px', borderRadius:16, border:'1px solid rgba(255,255,255,0.05)', background:'rgba(255,255,255,0.02)', cursor:'pointer', transition:'all 0.3s' }}
+              onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.05)'}
+              onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.02)'}>
+              <svg viewBox="0 0 24 24" fill="currentColor" style={{ width:20, height:20, color:c.color, flexShrink:0 }}>
                 <path d={c.path} />
               </svg>
               <span style={{ fontSize:14, color:'rgba(255,255,255,0.7)' }}>{c.value}</span>
@@ -189,35 +163,37 @@ export default function App() {
   };
 
   return (
-    <>
-      <Cursor />
+    <div style={{ height:'100vh', width:'100vw', overflow:'hidden', background:'#080808', color:'#fff', fontFamily:"'DM Sans', sans-serif" }}>
 
       {/* Status bar */}
-      <div style={{ position:'fixed', top:20, left:'50%', transform:'translateX(-50%)', zIndex:50, display:'flex', alignItems:'center', gap:20, padding:'8px 20px', borderRadius:100, border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', backdropFilter:'blur(20px)' }}>
+      <div style={{ position:'fixed', top:20, left:'50%', transform:'translateX(-50%)', zIndex:50, display:'flex', alignItems:'center', gap:20, padding:'8px 20px', borderRadius:100, border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', backdropFilter:'blur(20px)', whiteSpace:'nowrap' }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <span style={{ width:6, height:6, borderRadius:'50%', background:'#c8f135', display:'inline-block', animation:'pulse-slow 3s ease-in-out infinite' }} />
-          <span className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>System Ready</span>
+          <span style={{ width:6, height:6, borderRadius:'50%', background:'#c8f135', display:'inline-block' }} />
+          <span style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>System Ready</span>
         </div>
         <div style={{ width:1, height:12, background:'rgba(255,255,255,0.1)' }} />
-        <span className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>{statusTime || '00:00:00'} SAST</span>
+        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>{statusTime || '00:00:00'} SAST</span>
         <div style={{ width:1, height:12, background:'rgba(255,255,255,0.1)' }} />
-        <span className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>CPT · ZA</span>
+        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)' }}>CPT · ZA</span>
       </div>
 
-      {/* Grid */}
-      <div style={{ position:'relative', height:'100vh', width:'100%', overflow:'hidden', perspective:'1200px' }}>
+      {/* Bento grid */}
+      <div style={{ position:'relative', height:'100vh', width:'100%', perspective:'1200px' }}>
         {blocks.map((block) => {
           const isActive = activeBlock?.id === block.id;
           const dimmed   = anyActive && !isActive;
+
           return (
             <div
               key={block.id}
               onClick={() => !block.isLogo && setActiveBlock(block)}
+              onMouseEnter={e => { if (!block.isLogo) { e.currentTarget.style.borderColor='rgba(255,255,255,0.14)'; e.currentTarget.style.boxShadow='0 24px 80px rgba(0,0,0,0.6)'; }}}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = block.isLogo ? 'transparent' : 'rgba(255,255,255,0.06)'; e.currentTarget.style.boxShadow='none'; }}
               style={{
                 position: 'absolute',
                 borderRadius: 20,
                 overflow: 'hidden',
-                cursor: block.isLogo ? 'default' : 'none',
+                cursor: block.isLogo ? 'default' : 'pointer',
                 border: `1px solid ${block.isLogo ? 'transparent' : 'rgba(255,255,255,0.06)'}`,
                 background: block.isLogo ? '#c8f135' : '#0f0f0f',
                 ...block.pos,
@@ -228,21 +204,17 @@ export default function App() {
                   : dimmed ? 'scale(0.97)' : 'none',
                 transition: 'opacity 0.6s ease, filter 0.5s ease, transform 1.2s cubic-bezier(0.19,1,0.22,1), border-color 0.3s ease, box-shadow 0.3s ease',
                 pointerEvents: dimmed ? 'none' : 'auto',
-                boxShadow: !block.isLogo && hoveredBlock === block.id ? '0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px rgba(0,0,0,0.6)' : 'none',
               }}
-              onMouseEnter={e => { if (!block.isLogo) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px rgba(0,0,0,0.6)'; } }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.boxShadow = 'none'; }}
             >
-
               {/* ── LOGO ── */}
               {block.isLogo && (
                 <div style={{ height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'3vw' }}>
-                  <div style={{ width:32, height:32, borderRadius:8, background:'rgba(0,0,0,0.2)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span className="font-display" style={{ color:'rgba(0,0,0,0.6)', fontSize:11, letterSpacing:'0.06em' }}>AR</span>
+                  <div style={{ width:32, height:32, borderRadius:8, background:'rgba(0,0,0,0.15)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontFamily:"'Bebas Neue',sans-serif", color:'rgba(0,0,0,0.5)', fontSize:11, letterSpacing:'0.06em' }}>AR</span>
                   </div>
                   <div>
-                    <h1 className="font-display" style={{ fontSize:'5.5vw', color:'#000', lineHeight:1, margin:0 }}>ARCODIC.</h1>
-                    <p className="font-mono-custom" style={{ fontSize:'0.6vw', letterSpacing:'0.4em', color:'rgba(0,0,0,0.4)', textTransform:'uppercase', marginTop:8, marginBottom:0 }}>Web Studio · Since 2022</p>
+                    <h1 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:'5.5vw', color:'#000', lineHeight:1, margin:0 }}>ARCODIC.</h1>
+                    <p style={{ fontFamily:"'DM Mono',monospace", fontSize:'0.6vw', letterSpacing:'0.4em', color:'rgba(0,0,0,0.4)', textTransform:'uppercase', margin:'8px 0 0' }}>Web Studio · Since 2022</p>
                   </div>
                 </div>
               )}
@@ -252,12 +224,11 @@ export default function App() {
                 <>
                   <div style={{ position:'absolute', inset:0, zIndex:0 }}>
                     {demos.map((d, idx) => (
-                      <img key={d.id} src={d.img} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'all 1s ease', opacity: currentDemo === idx ? 0.45 : 0, transform: currentDemo === idx ? 'scale(1)' : 'scale(1.06)' }} />
+                      <img key={d.id} src={d.img} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'opacity 1s ease, transform 1s ease', opacity: currentDemo===idx ? 0.45 : 0, transform: currentDemo===idx ? 'scale(1)' : 'scale(1.06)' }} />
                     ))}
                     <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, #0f0f0f 0%, rgba(15,15,15,0.3) 50%, transparent 100%)' }} />
                     <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right, rgba(15,15,15,0.6), transparent)' }} />
                   </div>
-                  {/* progress dots */}
                   <div style={{ position:'absolute', top:20, right:20, zIndex:10, display:'flex', gap:6 }}>
                     {demos.map((_, i) => (
                       <div key={i} style={{ height:6, borderRadius:3, background: currentDemo===i ? '#c8f135' : 'rgba(255,255,255,0.2)', width: currentDemo===i ? 20 : 6, transition:'all 0.5s ease' }} />
@@ -271,9 +242,9 @@ export default function App() {
                       <ArrowUpRight size={16} style={{ color:'rgba(255,255,255,0.3)' }} />
                     </div>
                     <div>
-                      <p className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:8, color: demos[currentDemo].accent, transition:'color 0.7s' }}>{demos[currentDemo].tag}</p>
-                      <h2 className="font-display" style={{ fontSize:'3.5vw', lineHeight:1, color:'#fff', margin:0 }}>{demos[currentDemo].name}</h2>
-                      <p className="font-mono-custom" style={{ fontSize:10, color:'rgba(255,255,255,0.3)', marginTop:8, letterSpacing:'0.08em' }}>Click to explore all projects</p>
+                      <p style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:8, color: demos[currentDemo].accent, transition:'color 0.7s', margin:'0 0 8px' }}>{demos[currentDemo].tag}</p>
+                      <h2 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:'3.5vw', lineHeight:1, color:'#fff', margin:0 }}>{demos[currentDemo].name}</h2>
+                      <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:'rgba(255,255,255,0.3)', margin:'8px 0 0', letterSpacing:'0.08em' }}>Click to explore all projects</p>
                     </div>
                   </div>
                 </>
@@ -299,9 +270,9 @@ export default function App() {
                     <div>
                       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
                         <span style={{ width:6, height:6, borderRadius:'50%', background:'#34d399', display:'inline-block' }} />
-                        <span className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'#34d399' }}>Available Q2</span>
+                        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'#34d399' }}>Available Q2</span>
                       </div>
-                      <p className="font-mono-custom" style={{ fontSize:10, letterSpacing:'0.12em', textTransform:'uppercase', color: contacts[currentContact].color, transition:'color 0.7s', margin:0 }}>{contacts[currentContact].value}</p>
+                      <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, letterSpacing:'0.12em', textTransform:'uppercase', color: contacts[currentContact].color, transition:'color 0.7s', margin:0 }}>{contacts[currentContact].value}</p>
                     </div>
                   </div>
                 </>
@@ -320,7 +291,7 @@ export default function App() {
                     {services.map((s, i) => (
                       <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 0', borderBottom: i < services.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
                         <span style={{ color:'#c8f135', flexShrink:0 }}>{s.icon}</span>
-                        <span className="font-display" style={{ fontSize:16, letterSpacing:'0.05em', color:'rgba(255,255,255,0.7)' }}>{s.label}</span>
+                        <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:16, letterSpacing:'0.05em', color:'rgba(255,255,255,0.7)' }}>{s.label}</span>
                       </div>
                     ))}
                   </div>
@@ -335,8 +306,8 @@ export default function App() {
                     <ArrowUpRight size={14} style={{ color:'rgba(255,255,255,0.3)' }} />
                   </div>
                   <div>
-                    <div className="font-display" style={{ fontSize:'3.5vw', color:'#c8f135', lineHeight:1 }}>24H</div>
-                    <p className="font-mono-custom" style={{ fontSize:8, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', margin:'4px 0 0' }}>Sprint</p>
+                    <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:'3.5vw', color:'#c8f135', lineHeight:1 }}>24H</div>
+                    <p style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', margin:'4px 0 0' }}>Sprint</p>
                   </div>
                 </div>
               )}
@@ -367,33 +338,33 @@ export default function App() {
 
       {/* ── POPUP ── */}
       {activeBlock && (
-        <div className="popup-overlay">
-          <div className="popup-backdrop" onClick={() => setActiveBlock(null)} />
-          <div className="popup-panel">
-            <div style={{ display:'flex', flexDirection:'row', minHeight:'55vh' }}>
-              <div style={{ width:'38%', padding:'40px', borderRight:'1px solid rgba(255,255,255,0.06)', display:'flex', flexDirection:'column', justifyContent:'space-between', background:'rgba(0,0,0,0.3)', flexShrink:0 }}>
+        <div style={{ position:'fixed', inset:0, zIndex:120, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+          <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.92)', backdropFilter:'blur(32px)' }} onClick={() => setActiveBlock(null)} />
+          <div style={{ position:'relative', background:'#0a0a0a', border:'1px solid rgba(255,255,255,0.1)', borderRadius:28, width:'100%', maxWidth:900, maxHeight:'88vh', overflow:'hidden', boxShadow:'0 40px 120px rgba(0,0,0,0.8)', animation:'fadeUp 0.4s cubic-bezier(0.19,1,0.22,1) both' }}>
+            <div style={{ display:'flex', minHeight:'55vh' }}>
+              <div style={{ width:'38%', padding:40, borderRight:'1px solid rgba(255,255,255,0.06)', display:'flex', flexDirection:'column', justifyContent:'space-between', background:'rgba(0,0,0,0.3)', flexShrink:0 }}>
                 <div>
-                  <span className="font-mono-custom" style={{ fontSize:9, letterSpacing:'0.5em', textTransform:'uppercase', color:'#c8f135', display:'block', marginBottom:24 }}>{activeBlock.label}</span>
-                  <h3 className="font-display" style={{ fontSize:48, lineHeight:1, color:'#fff', margin:0 }}>{activeBlock.title || 'Details'}</h3>
+                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.5em', textTransform:'uppercase', color:'#c8f135', display:'block', marginBottom:24 }}>{activeBlock.label}</span>
+                  <h3 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:48, lineHeight:1, color:'#fff', margin:0 }}>{activeBlock.title || 'Details'}</h3>
                   <div style={{ width:32, height:2, background:'rgba(200,241,53,0.4)', marginTop:24 }} />
                 </div>
                 <button onClick={() => setActiveBlock(null)}
-                  style={{ display:'flex', alignItems:'center', gap:12, fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.4em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', background:'none', border:'none', cursor:'none', padding:0, transition:'color 0.3s' }}
-                  onMouseEnter={e=>e.currentTarget.style.color='rgba(255,255,255,0.8)'}
-                  onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.3)'}>
+                  style={{ display:'flex', alignItems:'center', gap:12, fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:'0.4em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', background:'none', border:'none', cursor:'pointer', padding:0 }}
+                  onMouseEnter={e => e.currentTarget.style.color='rgba(255,255,255,0.8)'}
+                  onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.3)'}>
                   <div style={{ width:28, height:28, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <X size={12} />
                   </div>
                   Close
                 </button>
               </div>
-              <div style={{ flex:1, padding:'40px', display:'flex', alignItems:'center', overflowY:'auto' }}>
-                <div className="animate-fade-up" style={{ width:'100%' }}>{renderPopup()}</div>
+              <div style={{ flex:1, padding:40, display:'flex', alignItems:'center', overflowY:'auto' }}>
+                <div style={{ width:'100%' }}>{renderPopup()}</div>
               </div>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
