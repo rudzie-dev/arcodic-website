@@ -245,7 +245,7 @@ export default function App() {
 
   // ── Mobile layout (< 768px) ──────────────────────────────────────
   const MobileLayout = () => (
-    <div style={{ height:'100vh', overflowY:'auto', padding:'16px', display:'flex', flexDirection:'column', gap:12, paddingTop:64 }}>
+    <div style={{ minHeight:'100vh', padding:'72px 16px 32px', display:'flex', flexDirection:'column', gap:12 }}>
       {/* Logo */}
       <div style={{ borderRadius:16, background:C.logo, padding:'28px 24px', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
         <div>
@@ -258,7 +258,7 @@ export default function App() {
       {/* Manifesto */}
       <div style={{ borderRadius:16, background:C.surface, border:'1px solid rgba(255,255,255,0.05)', padding:'32px 28px', position:'relative', overflow:'hidden' }}>
         <Quote size={48} style={{ position:'absolute', top:14, right:14, color:'rgba(255,255,255,0.04)' }} />
-        <p style={{ fontFamily:"'Godber',sans-serif", fontSize:36, color:C.textHi, lineHeight:1.2, margin:0 }}>
+        <p style={{ fontFamily:"'Godber',sans-serif", fontSize:36, color:C.textHi, lineHeight:1.25, margin:0, position:'relative', zIndex:1 }}>
           We build fast.<br/>We build right.<br/>That's it.
         </p>
         <div style={{ width:20, height:1, background:`${C.glint}50`, marginTop:16 }} />

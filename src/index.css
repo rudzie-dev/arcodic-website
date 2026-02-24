@@ -122,13 +122,20 @@ body::after {
 .desktop-only { display: block; height: 100vh; }
 
 @media (max-width: 768px) {
-  html, body, #root {
-    overflow: visible;
-    height: auto;
+  html {
+    height: auto !important;
+    overflow: auto !important;
+  }
+  body {
+    height: auto !important;
+    overflow: auto !important;
+  }
+  #root {
+    height: auto !important;
+    overflow: visible !important;
   }
 
-  .mobile-only  { display: block; min-height: 100vh; overflow-y: auto; }
+  .mobile-only  { display: block; }
   .desktop-only { display: none; }
-
-  .popup-panel { border-radius: 20px; }
+  .popup-panel  { border-radius: 20px; }
 }
