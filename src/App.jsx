@@ -347,7 +347,7 @@ export default function App() {
   );
 
   return (
-    <div style={{ height:'100vh', width:'100vw', overflow:'hidden', background:C.bg, color:'#fff', fontFamily:"'DM Sans',sans-serif" }}>
+    <div className="app-root" style={{ width:'100%', background:C.bg, color:'#fff', fontFamily:"'DM Sans',sans-serif" }}>
 
       {/* Status bar */}
       <div style={{ position:'fixed', top:20, left:'50%', transform:'translateX(-50%)', zIndex:50, display:'flex', alignItems:'center', gap:18, padding:'7px 18px', borderRadius:100, border:'1px solid rgba(255,255,255,0.06)', background:'rgba(255,255,255,0.03)', backdropFilter:'blur(20px)', whiteSpace:'nowrap' }}>

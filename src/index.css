@@ -132,6 +132,14 @@ body::after {
 .mobile-only  { display: none; }
 .desktop-only { display: block; height: 100vh; }
 
+/* Desktop app wrapper gets the lock */
+@media (min-width: 769px) {
+  .app-root {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 768px) {
   html {
     height: auto !important;
