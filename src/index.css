@@ -116,3 +116,15 @@ body::after {
   box-shadow: 0 40px 120px rgba(0,0,0,0.9);
 }
 .animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.19,1,0.22,1) both; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+.mobile-only  { display: none; }
+.desktop-only { display: block; height: 100vh; }
+
+@media (max-width: 768px) {
+  .mobile-only  { display: block; height: 100vh; overflow-y: auto; }
+  .desktop-only { display: none; }
+
+  /* status bar smaller on mobile */
+  .popup-panel { border-radius: 20px; }
+}
