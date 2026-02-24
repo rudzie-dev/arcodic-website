@@ -245,7 +245,7 @@ export default function App() {
 
   // ── Mobile layout (< 768px) ──────────────────────────────────────
   const MobileLayout = () => (
-    <div style={{ minHeight:'100vh', padding:'72px 16px 32px', display:'flex', flexDirection:'column', gap:12 }}>
+    <div style={{ padding:'72px 16px 32px', display:'flex', flexDirection:'column', gap:12 }}>
       {/* Logo */}
       <div style={{ borderRadius:16, background:C.logo, padding:'28px 24px', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
         <div>
