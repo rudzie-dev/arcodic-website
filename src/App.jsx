@@ -89,7 +89,7 @@ export default function App() {
     { id:'work',    isWork:true,    pos:{ top:'3vh',    right:'3vw',  width:'55vw', height:'62vh' }, label:'WORK',      title:'Portfolio' },
     { id:'cta',     isContact:true, pos:{ bottom:'3vh', right:'3vw',  width:'55vw', height:'28vh' }, label:'CONTACT',   title:'Direct Channels' },
     { id:'service',                 pos:{ top:'39vh',   left:'3vw',   width:'22vw', height:'30vh' }, label:'EXPERTISE', title:'The Stack' },
-    { id:'about',   isAbout:true,   pos:{ top:'39vh',   left:'27vw',  width:'10vw', height:'30vh' }, label:'ABOUT' },
+    { id:'about',   isAbout:true,   pos:{ top:'39vh',   left:'27vw',  width:'11vw', height:'30vh' }, label:'ABOUT' },
     { id:'speed',                   pos:{ bottom:'3vh', left:'3vw',   width:'16vw', height:'21vh' }, label:'24H',       title:'Sprint Delivery' },
     { id:'social',                  pos:{ bottom:'3vh', left:'21vw',  width:'16vw', height:'21vh' }, label:'CONNECT',   title:'Global Feed' },
   ];
@@ -256,9 +256,12 @@ export default function App() {
       </div>
 
       {/* Manifesto */}
-      <div style={{ borderRadius:16, background:C.surface, border:'1px solid rgba(255,255,255,0.05)', padding:'24px', position:'relative', overflow:'hidden' }}>
-        <Quote size={36} style={{ position:'absolute', top:14, right:14, color:'rgba(255,255,255,0.04)' }} />
-        <p style={{ fontFamily:"'Godber',sans-serif", fontSize:28, color:C.textHi, lineHeight:1.2, margin:0 }}>We build fast.<br/>We build right.<br/>That's it.</p>
+      <div style={{ borderRadius:16, background:C.surface, border:'1px solid rgba(255,255,255,0.05)', padding:'32px 28px', position:'relative', overflow:'hidden' }}>
+        <Quote size={48} style={{ position:'absolute', top:14, right:14, color:'rgba(255,255,255,0.04)' }} />
+        <p style={{ fontFamily:"'Godber',sans-serif", fontSize:36, color:C.textHi, lineHeight:1.2, margin:0 }}>
+          We build fast.<br/>We build right.<br/>That's it.
+        </p>
+        <div style={{ width:20, height:1, background:`${C.glint}50`, marginTop:16 }} />
       </div>
 
       {/* Work */}
@@ -484,16 +487,16 @@ export default function App() {
 
               {/* ── ABOUT ── */}
               {block.isAbout && (
-                <div style={{ height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'2.2vw', position:'relative' }}>
+                <div style={{ height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'1.8vw', position:'relative' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                    <span style={pill}><Quote size={7}/> About</span>
-                    <ArrowUpRight size={15} style={{ color:'rgba(255,255,255,0.25)' }} />
+                    <span style={{ ...pill, fontSize:7, padding:'2px 8px' }}><Quote size={6}/> About</span>
+                    <ArrowUpRight size={13} style={{ color:'rgba(255,255,255,0.25)' }} />
                   </div>
                   <div>
-                    <p style={{ fontFamily:"'Godber',sans-serif", fontSize:'1.6vw', color:C.textHi, lineHeight:1.2, margin:0 }}>
-                      We build fast.<br/>We build right.<br/>That's it.
+                    <p style={{ fontFamily:"'Godber',sans-serif", fontSize:'1.45vw', color:C.textHi, lineHeight:1.25, margin:0 }}>
+                      We build<br/>fast. We<br/>build right.<br/>That's it.
                     </p>
-                    <div style={{ width:16, height:1, background:`${C.glint}50`, marginTop:12 }} />
+                    <div style={{ width:14, height:1, background:`${C.glint}50`, marginTop:10 }} />
                   </div>
                 </div>
               )}
