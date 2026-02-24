@@ -18,9 +18,9 @@ const C = {
 const BRAND = { wa:'#25D366', ig:'#E1306C', mail:'#818cf8' };
 
 const demos = [
-  { id:1, name:'Noir Atelier',     tag:'Luxury Hospitality', img:'/salon-hero.webp',         fallback:'linear-gradient(135deg,#2a1f14,#4a3520)' },
-  { id:2, name:'Roast & Ritual',   tag:'Boutique Coffee',    img:'/coffee-hero.webp',         fallback:'linear-gradient(135deg,#1a1008,#3d2406)' },
-  { id:3, name:'MG Installations', tag:'Technical Services', img:'/mg-installations.webp',    fallback:'linear-gradient(135deg,#0d1520,#1a2d45)' },
+  { id:1, name:'Noir Atelier',     tag:'Luxury Hospitality', img:'/salon-hero.webp',         fallback:'linear-gradient(135deg,#2a1f14,#4a3520)', href:'https://lumiere-salon.arcodic.com' },
+  { id:2, name:'Roast & Ritual',   tag:'Boutique Coffee',    img:'/coffee-hero.webp',         fallback:'linear-gradient(135deg,#1a1008,#3d2406)', href:'https://ritual-coffee.arcodic.com' },
+  { id:3, name:'MG Installations', tag:'Technical Services', img:'/mg-installations.webp',    fallback:'linear-gradient(135deg,#0d1520,#1a2d45)', href:'https://mg-installations.arcodic.com' },
 ];
 
 const contacts = [
@@ -57,7 +57,7 @@ function ProjectImg({ src, fallback, style }) {
 export default function App() {
   const [dispersed,      setDispersed]      = useState(false);
   const [activeBlock,    setActiveBlock]    = useState(null);
-  const [expandedDemo,   setExpandedDemo]   = useState(null);
+  const [mobileSpeedOpen, setMobileSpeedOpen] = useState(false);
   const [currentDemo,    setCurrentDemo]    = useState(0);
   const [currentContact, setCurrentContact] = useState(0);
   const [mousePos,       setMousePos]       = useState({ x:0, y:0 });
@@ -138,7 +138,7 @@ export default function App() {
                     <p style={{ fontSize:13, color:C.textDim, lineHeight:1.7, margin:'14px 0 12px' }}>
                       A bespoke digital presence crafted for {d.name}. Focused on performance, conversion, and brand alignment from the ground up.
                     </p>
-                    <a href="#" style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.14em', textTransform:'uppercase', color:C.glint, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+                    <a href={d.href} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.14em', textTransform:'uppercase', color:C.glint, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
                       View live site <ExternalLink size={10}/>
                     </a>
                   </div>
@@ -298,8 +298,11 @@ export default function App() {
 
       {/* Speed + Social row */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <div style={{ borderRadius:16, background:C.surface, border:'1px solid rgba(255,255,255,0.05)', padding:'20px', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:120 }}>
-          <Zap size={14} style={{ color:`${C.glint}99` }} />
+        <div onClick={() => setMobileSpeedOpen(true)} style={{ borderRadius:16, background:C.surface, border:'1px solid rgba(255,255,255,0.05)', padding:'20px', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:120, cursor:'pointer' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+            <Zap size={14} style={{ color:`${C.glint}99` }} />
+            <ArrowUpRight size={13} style={{ color:'rgba(255,255,255,0.22)' }} />
+          </div>
           <div>
             <div style={{ fontFamily:"'Godber',sans-serif", fontSize:36, color:C.glint, lineHeight:1 }}>24H</div>
             <p style={{ fontFamily:"'DM Mono',monospace", fontSize:7, letterSpacing:'0.12em', textTransform:'uppercase', color:C.textDim, margin:'4px 0 0' }}>Sprint</p>
@@ -343,6 +346,34 @@ export default function App() {
         ))}
       </div>
       <div style={{ height:16 }} />
+
+      {/* Mobile 24H Sprint Popup */}
+      {mobileSpeedOpen && (
+        <div style={{ position:'fixed', inset:0, zIndex:120, display:'flex', alignItems:'flex-end', padding:'0' }}>
+          <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(32px)' }} onClick={() => setMobileSpeedOpen(false)} />
+          <div style={{ position:'relative', width:'100%', background:'#0e0e0e', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'24px 24px 0 0', padding:'32px 24px 48px', animation:'fadeUp 0.35s cubic-bezier(0.19,1,0.22,1) both' }}>
+            {/* drag handle */}
+            <div style={{ width:36, height:3, borderRadius:2, background:'rgba(255,255,255,0.12)', margin:'0 auto 28px' }} />
+            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.5em', textTransform:'uppercase', color:C.textMid, display:'block', marginBottom:12 }}>24H</span>
+            <h3 style={{ fontFamily:"'Godber',sans-serif", fontSize:44, lineHeight:1.05, color:C.textHi, margin:'0 0 4px' }}>Sprint Delivery</h3>
+            <div style={{ width:24, height:1, background:`${C.glint}60`, marginBottom:24 }} />
+            <div style={{ padding:'24px', borderRadius:16, border:`1px solid ${C.glint}22`, background:`${C.glint}08`, textAlign:'center', marginBottom:16 }}>
+              <div style={{ fontFamily:"'Godber',sans-serif", fontSize:72, color:C.glint, lineHeight:1 }}>24H</div>
+              <p style={{ fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.16em', textTransform:'uppercase', color:C.textDim, margin:'8px 0 0' }}>Delivery Sprint</p>
+            </div>
+            <p style={{ fontSize:14, color:C.textDim, lineHeight:1.75, margin:0 }}>
+              From brief to live site in a single business day. No compromises on quality — we've built the systems to move fast without breaking things.
+            </p>
+            <button onClick={() => setMobileSpeedOpen(false)}
+              style={{ marginTop:28, display:'flex', alignItems:'center', gap:10, fontFamily:"'DM Mono',monospace", fontSize:8, letterSpacing:'0.4em', textTransform:'uppercase', color:C.textDim, background:'none', border:'none', cursor:'pointer', padding:0 }}>
+              <div style={{ width:26, height:26, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.08)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <X size={11} />
+              </div>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 
